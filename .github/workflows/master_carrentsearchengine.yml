@@ -44,7 +44,7 @@ jobs:
       # Copy React build to .NET's wwwroot folder
       - name: Copy React build to .NET wwwroot
         run: |
-          xcopy /s /e /y ClientApp/build/* ${GITHUB_WORKSPACE}/wwwroot/
+          xcopy /s /e /y car_rent.client/build/* ${GITHUB_WORKSPACE}/wwwroot/
 
       # Upload artifacts for deployment job
       - name: Upload artifact for deployment job
