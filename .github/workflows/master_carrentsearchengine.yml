@@ -24,10 +24,6 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      # Publish the .NET Core backend (for deployment)
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
       # Set up Node.js (for building React)
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -41,10 +37,15 @@ jobs:
           npm install
           npm run build
 
-      # Copy React build to .NET's wwwroot folder
+      # Copy React build to .NET wwwroot folder
       - name: Copy React build to .NET wwwroot
         run: |
-          xcopy /s /e /y car_rent.client/build/* ${GITHUB_WORKSPACE}/wwwroot/
+          mkdir -p car_rent.Server/wwwroot  # Ensure wwwroot folder exists
+          cp -R car_rent.client/build/* car_rent.Server/wwwroot/  # Copy build output to wwwroot
+
+      # Publish the .NET Core backend (for deployment)
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       # Upload artifacts for deployment job
       - name: Upload artifact for deployment job
