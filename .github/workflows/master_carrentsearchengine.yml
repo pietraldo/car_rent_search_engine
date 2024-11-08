@@ -19,10 +19,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build .NET backend
-        run: dotnet build car_rent.Server --configuration Release
+        run: dotnet build car_rent.Server --configuration Server-Realise
 
       - name: Publish .NET backend
-        run: dotnet publish car_rent.Server --configuration Release-ServerOnly -o ${{ runner.workspace }}/myapp
+        run: dotnet publish car_rent.Server --configuration Server-Realise -o ${{ runner.workspace }}/myapp
 
 
 
