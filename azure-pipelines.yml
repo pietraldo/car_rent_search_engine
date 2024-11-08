@@ -1,0 +1,58 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- master
+
+pool:
+  name: SelfHostedAgents
+
+variables:
+  buildConfiguration: 'Release'  
+
+jobs:
+- job: BuildFrontend
+  displayName: 'Build Frontend'
+  pool:
+    name: 'SelfHostedAgents'  
+  steps:
+    - checkout: self  
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'  
+    - script: |
+        cd car_rent.client  
+        npm install 
+        npm run build  
+      displayName: 'Build React App'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'car_rent.client/dist'  
+        ArtifactName: 'frontend-artifact'  
+        publishLocation: 'Container'  
+
+- job: BuildBackend
+  displayName: 'Build Backend'
+  pool:
+    name: 'SelfHostedAgents' 
+  steps:
+    - checkout: self  
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'  
+        configuration: '$(buildConfiguration)'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'  
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/backend'
+        publishWebProjects: true
+        zipAfterPublish: true
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend' 
+        ArtifactName: 'backend-artifact'  
+        publishLocation: 'Container'  

@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "car_rent.Server", "car_rent.Server\car_rent.Server.csproj", "{D76F3404-6633-44E8-BB6F-FA4110596C1E}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "car_rent.client", "car_rent.client\car_rent.client.esproj", "{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D76F3404-6633-44E8-BB6F-FA4110596C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D76F3404-6633-44E8-BB6F-FA4110596C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D76F3404-6633-44E8-BB6F-FA4110596C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D76F3404-6633-44E8-BB6F-FA4110596C1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C8DA47-2D3C-4132-9CD8-C960A8C266FB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54F06F1D-B732-4B38-8E1E-B134DD4C750F}
+	EndGlobalSection
+EndGlobal

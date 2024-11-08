@@ -1,0 +1,41 @@
+.calendar {
+    width: 100%; /* Ensure it takes the full width */
+    max-width: 300px; /* Optional: Limit the maximum width */
+    padding: 10px; /* Add some padding for better appearance */
+    margin: 20px auto; /* Center the DatePicker on the page */
+    border-radius: 5px; /* Make the corners rounded */
+    border: 1px solid #ccc; /* Light border */
+}
+
+h1 {
+    text-align: center; /* Center the title */
+    margin-bottom: 20px; /* Space below the title */
+}
+
+.datepicker {
+    position: absolute; /* Ensure the calendar is positioned correctly */
+    z-index: 1000; /* Ensure it appears above other content */
+}
+
+.reserve-container {
+    position: relative; /* Relative positioning for dropdown positioning */
+}
+
+/*.date-picker-button {
+    background-color: rgb(255, 0, 0);*/ /* Button color */
+    /*color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;*/ /* Rounded corners */
+    /*width: 100%;*/ /* Make it full width */
+    /*text-align: left;*/ /* Align text to the left */
+    /*margin: 20px 0;*/ /* Spacing */
+/*}*/
+
+.date-picker-dropdown {
+    position: absolute; /* Absolute positioning to position dropdown */
+    top: 100%; /* Position below the button */
+    left: 0; /* Align to the left of the button */
+    z-index: 1000; /* Ensure it appears above other content */
+}

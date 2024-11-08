@@ -1,0 +1,53 @@
+/* Dropdown.css */
+
+.dropdown {
+    position: relative;
+    display: grid;
+    width: 50%;
+}
+
+.dropdown-toggle {
+    padding: 8px 16px;
+    background-color: snow;
+    color: grey;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0;
+    width: 100%;
+    z-index: 1000;
+}
+    .dropdown-menu li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+
+        .dropdown-menu li:hover {
+            background-color: #f1f1f1;
+            cursor: pointer; /* Ensures pointer cursor on hover */
+        }    
+
+.dropdown-text {
+    flex-grow: 1; /* Pushes the text to the left */
+    text-align: left;
+}
+
+.dropdown-checkbox {
+    margin-left: 8px; /* Optional spacing between text and checkbox */
+    cursor: pointer;
+}
