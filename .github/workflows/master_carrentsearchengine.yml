@@ -40,7 +40,6 @@ jobs:
       # Copy React build to .NET wwwroot folder
       - name: Copy React build to .NET wwwroot
         run: |
-          mkdir -p car_rent.Server/wwwroot  # Ensure wwwroot folder exists
           cp -R car_rent.client/build/* car_rent.Server/wwwroot/  # Copy build output to wwwroot
 
       # Publish the .NET Core backend (for deployment)
