@@ -24,32 +24,6 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      # Set up Node.js (for building React)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'  # Use the Node version that works with your React app
-
-      # Install React dependencies and build the React app
-      - name: Install dependencies and build React
-        run: |
-          cd car_rent.client
-          npm install
-          npm run build
-
-      # Verify the React build output
-      - name: List React build directory
-        run: |
-          dir car_rent.client\build
-
-      # Copy React build to .NET wwwroot folder
-      - name: Copy React build to .NET wwwroot
-        run: |
-          if (!(Test-Path -Path car_rent.Server\wwwroot)) {
-            New-Item -ItemType Directory -Force -Path car_rent.Server\wwwroot
-          }
-          Copy-Item -Path car_rent.client\build\* -Destination car_rent.Server\wwwroot -Recurse -Force
-
       # Publish the .NET Core backend (for deployment)
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
