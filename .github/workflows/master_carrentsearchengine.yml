@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - carrentsearchengine
+name: Build and deploy ASP.Net Core app with React to Azure Web App - carrentsearchengine
 
 on:
   push:
@@ -11,26 +11,47 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Checkout the repository
       - uses: actions/checkout@v4
 
+      # Set up .NET Core SDK
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
-      - name: Build .NET backend
-        run: dotnet build car_rent.Server --configuration Server-Realise
+      # Build the .NET Core backend
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
 
-      - name: Publish .NET backend
-        run: dotnet publish car_rent.Server --configuration Server-Realise -o ${{ runner.workspace }}/myapp
+      # Publish the .NET Core backend (for deployment)
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
+      # Set up Node.js (for building React)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'  # Use the Node version that works with your React app
 
+      # Install React dependencies and build the React app
+      - name: Install dependencies and build React
+        run: |
+          cd ClientApp  # Assuming your React app is in the ClientApp directory
+          npm install
+          npm run build
 
+      # Copy React build to .NET's wwwroot folder
+      - name: Copy React build to .NET wwwroot
+        run: |
+          xcopy /s /e /y ClientApp/build/* ${GITHUB_WORKSPACE}/wwwroot/
+
+      # Upload artifacts for deployment job
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{ runner.workspace }}/myapp
+          name: app-artifacts
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -39,14 +60,16 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write
 
     steps:
+      # Download the artifacts from the build job
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
+          name: app-artifacts
 
+      # Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -54,10 +77,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
+      # Deploy to Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'carrentsearchengine'
-          slot-name: 'Production'
-          package: ${{ runner.workspace }}/myapp
+          app-name: 'carrentsearchengine'  # Replace with your Web App name
+          slot-name: 'Production'  # Use the slot you want to deploy to (e.g., 'staging', 'production')
+          package: .  # Path to the directory to deploy (the root of your repo after build)
