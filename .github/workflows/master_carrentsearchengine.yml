@@ -37,7 +37,7 @@ jobs:
       # Install React dependencies and build the React app
       - name: Install dependencies and build React
         run: |
-          cd ClientApp  # Assuming your React app is in the ClientApp directory
+          cd car_rent.client  # Assuming your React app is in the ClientApp directory
           npm install
           npm run build
 
