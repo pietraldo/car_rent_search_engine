@@ -22,7 +22,8 @@ jobs:
         run: dotnet build car_rent.Server --configuration Release
 
       - name: Publish .NET backend
-        run: dotnet publish car_rent.Server --configuration Release -o ${{ runner.workspace }}/myapp
+        run: dotnet publish car_rent.Server/car_rent.Server.csproj --configuration Release -o ${{ runner.workspace }}/myapp
+
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
