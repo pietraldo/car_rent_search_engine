@@ -1,0 +1,6 @@
+@car_rent_api2.Server_HostAddress = http://localhost:5098
+
+GET {{car_rent_api2.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,71 @@
+name: Build and deploy ASP.Net Core app with React to Azure Web App - carrentsearchengine
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v4
+
+      # Set up .NET Core SDK
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      # Build the .NET Core backend
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      # Publish the .NET Core backend (for deployment)
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      # Upload artifacts for deployment job
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifacts
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write
+
+    steps:
+      # Download the artifacts from the build job
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: app-artifacts
+
+      # Login to Azure
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_112249FE1B0A4B6EA1CA3253F85D246A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_419B4D7D0AAF45B883FC5B24046CCEFB }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_02D619031269450C8A777F5D8688EE61 }}
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'carrentapi3'
+          slot-name: 'Production'
+          package: .
+
+
+
