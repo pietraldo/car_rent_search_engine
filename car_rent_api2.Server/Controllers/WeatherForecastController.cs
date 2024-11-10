@@ -1,33 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 
+public class MessageRequest
+{
+    public string Message { get; set; }
+}
+
 namespace car_rent_api2.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private static List<string> rozmowa = new List<string>() { "Siema Julka"};
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController()
         {
-            _logger = logger;
+        }
+
+        [HttpPost]
+        public IActionResult Add([FromBody] MessageRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Message))
+            {
+                return BadRequest("Message cannot be empty.");
+            }
+
+            rozmowa.Add(request.Message);
+            return Ok();  // Return a success status
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<string> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return rozmowa;
         }
     }
 }
