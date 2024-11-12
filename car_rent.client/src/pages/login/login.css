@@ -1,0 +1,20 @@
+.inputElement {
+    display: block;
+    width: 200px; /* Set desired width */
+    height: 30px; /* Set desired height */
+    margin: 10px 40vw; /* Adds vertical spacing between inputs */
+    padding: 5px; /* Adds padding inside the input fields */
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    border-radius: 8px; /* Increased for rounded corners */
+}
+
+.button {
+    background-color: rgb(255, 0, 0) !important; /* Ensure Bootstrap styles don't override */
+    color: white !important;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px; /* Adds spacing above the button */
+    width: 200px;
+    height: 40px; /* Set desired height */
+}
