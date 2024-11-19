@@ -18,14 +18,11 @@ function Element({ car, apiUrl }) {
                 className="carImage"
             />
             <div style={{ flex: 1 }}>
-                <h2 className="carTitle">{car.model}</h2>
-                <p className="carBrand">Brand: {car.brand}</p>
+                <h2 className="carTitle">{car.model} </h2>
                 <p className="carDescription">
-                    Tu bedzie opis samochodu <br />
-                    Tu bedzie opis samochodu <br />
-                    Tu bedzie opis samochodu <br />
-                    Tu bedzie opis samochodu <br />
-                    Tu bedzie opis samochodu <br />
+                    Marka: {car.brand} <br />
+                    Kolor: {car.color }  <br />
+                    Rok: {car.year } <br />
                 </p>
             </div>
             <div className="rentInfo">
