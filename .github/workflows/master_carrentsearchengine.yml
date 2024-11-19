@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      DB_CONNECTION_STRING_WYSZUKIWARKA: ${{ secrets.DB_CONNECTION_STRING_WYSZUKIWARKA }}
 
     steps:
       # Checkout the repository
@@ -19,6 +21,14 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+      
+      - name: Update database
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet tool restore
+          dotnet ef database update -c SearchEngineDbContext --project car_rent.Server
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
 
       # Build the .NET Core backend
       - name: Build with dotnet
