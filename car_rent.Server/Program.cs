@@ -10,7 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Configuration.AddEnvironmentVariables();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
 builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
