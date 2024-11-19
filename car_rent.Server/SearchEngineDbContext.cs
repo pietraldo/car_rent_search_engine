@@ -8,10 +8,7 @@ namespace car_rent_api2.Server.Database
         public DbSet<Rent> History { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Company>  Companies { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=ANDRUT;Database=SearchEngineDatabase;Trusted_Connection=True;TrustServerCertificate=True;");
-        }
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Primary keys for the tabels
