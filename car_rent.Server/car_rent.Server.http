@@ -1,6 +1,6 @@
-@car_rent_api2.Server_HostAddress = http://localhost:5098
+@car_rent.Server_HostAddress = http://localhost:5109
 
-GET {{car_rent_api2.Server_HostAddress}}/weatherforecast/
+GET {{car_rent.Server_HostAddress}}/cars/
 Accept: application/json
 
 ###

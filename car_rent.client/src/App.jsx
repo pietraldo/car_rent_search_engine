@@ -2,9 +2,19 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import NavigationBar from './components/NavigationBar/NavigationBar';
 import Element from './components/Element/Element';
+<<<<<<< HEAD
 import Login from './pages/login/login'; // Ensure this path is correct
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+=======
+import Filter from './components/Filter/Filter';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Login from './pages/login/login'; // Ensure this path is correct
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import Calendar from "react-calendar"
+>>>>>>> origin/master
 import Reserve from './pages/reserve/reserve'
 import SearchBar from './components/SearchBar/SearchBar';
 
