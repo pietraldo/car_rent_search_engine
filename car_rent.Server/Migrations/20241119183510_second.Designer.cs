@@ -9,11 +9,11 @@ using car_rent_api2.Server.Database;
 
 #nullable disable
 
-namespace car_rent_api2.Server.Migrations
+namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
-    [Migration("20241119114723_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241119183510_second")]
+    partial class second
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

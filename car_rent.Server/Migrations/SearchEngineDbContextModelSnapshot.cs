@@ -8,7 +8,7 @@ using car_rent_api2.Server.Database;
 
 #nullable disable
 
-namespace car_rent_api2.Server.Migrations
+namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
     partial class SearchEngineDbContextModelSnapshot : ModelSnapshot
