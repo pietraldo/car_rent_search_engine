@@ -1,94 +1,85 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import NavigationBar from './components/NavigationBar/NavigationBar';
+import Element from './components/Element/Element';
+import Login from './pages/login/login'; // Ensure this path is correct
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import Reserve from './pages/reserve/reserve'
+import SearchBar from './components/SearchBar/SearchBar';
 
-function App()
-{
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
 
-    useEffect(() =>
-    {
-        fetchMessages(); // Fetch messages on initial load
+function App() {
+    const [cars, setCars] = useState([]);
+    const [filteredCars, setFilteredCars] = useState([]);
+    const [selectedModel, setSelectedModel] = useState(null);
+    const apiUrl = import.meta.env.VITE_API_URL;
+    console.log(apiUrl);
+
+    useEffect(() => {
+        getCars();
     }, []);
 
-    const messageList = messages.length === 0 ? (
-        <p><em>No messages yet...</em></p>
-    ) : (
-        <div>
-            {messages.map((message, index) => (
-                <div key={index}>{message}</div>
-            ))}
-        </div>
-    );
+    async function getCars() {
+        try {
+            const response = await fetch('Car');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setCars(data);
+        } catch (error) {
+            console.error('Error fetching cars:', error);
+        }
+    }
+
+    const uniqueModels = [...new Set(cars.map(car => car.model))];
+
+    const contents = (selectedModel ? filteredCars : cars).length === 0
+        ? <p><em>Loading... Car data should be here if backend starts</em></p>
+        : (
+            <div>
+                {(selectedModel ? filteredCars : cars).map((car) => (
+                    <Element key={car.model} car={car} apiUrl={apiUrl} />
+                ))}
+            </div>
+        );
+
+    const handleSelect = (model) => {
+        setSelectedModel(model);
+        if (model) {
+            setFilteredCars(cars.filter(car => car.model === model));
+        } else {
+            setFilteredCars(cars); // Show all if no filter is selected
+        }
+    };
 
     return (
         <div>
-            <h1 id="messageLabel">Chat with Julka</h1>
-            {messageList}
-            <button onClick={fetchMessages}>Refresh Messages</button>
-            <input
-                type="text"
-                id="newMessageInput"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message here"
-            />
-            <button onClick={() => sendMessage(newMessage)}>Send</button>
+            <NavigationBar />
+            
+            <TransitionGroup>
+                <CSSTransition key={location.key} classNames="fade" timeout={300}>
+                    <Routes location={location}>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/" element={
+                            <div>
+                                <SearchBar />
+                                {contents}
+                            </div>} />
+                        <Route path="/reserve" element={<Reserve />} />
+                    </Routes>
+                </CSSTransition>
+            </TransitionGroup>
         </div>
     );
-
-    // Fetch messages from the backend
-    async function fetchMessages()
-    {
-        try
-        {
-            const response = await fetch('/weatherforecast');  // Use relative URL
-            if (response.ok)
-            {
-                const data = await response.json();
-                console.log(data);
-                setMessages(data);  // Update state with fetched messages
-            } else
-            {
-                console.error('Failed to fetch messages');
-            }
-        } catch (error)
-        {
-            console.error('Error fetching messages:', error);
-        }
-    }
-
-    // Send a new message to the backend
-    async function sendMessage(message)
-    {
-        if (!message) return;  // Prevent sending empty messages
-
-        try
-        {
-            const response = await fetch('/weatherforecast', {  // Use relative URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message }),  // Send the message in the expected JSON format
-            });
-
-            if (response.ok)
-            {
-                setNewMessage('');  // Clear the input field after sending
-                fetchMessages();    // Refresh the message list
-            } else
-            {
-                const errorText = await response.text(); // Log error message if POST failed
-                console.error('Failed to send message:', errorText);
-            }
-        } catch (error)
-        {
-            console.error('Error sending message:', error);
-        }
-    }
-
-
 }
 
-export default App;
+// Wrap your App with Router in your index.js or main file
+export default function AppWrapper() {
+    return (
+        <Router>
+            <App />
+        </Router>
+    );
+}

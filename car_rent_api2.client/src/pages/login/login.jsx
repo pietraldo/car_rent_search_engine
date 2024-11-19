@@ -1,25 +1,15 @@
-import React from 'react';
-import { GoogleLogin } from '@react-oauth/google';
+import Button from "react-bootstrap/Button"; // Correct import
+import "./login.css"
 
-const Login = () => {
-    const handleLoginSuccess = (credentialResponse) => {
-        console.log('Login Success:', credentialResponse);
-        // Send credentialResponse to your backend to authenticate
-    };
-
-    const handleLoginFailure = (error) => {
-        console.error('Login Failed:', error);
-    };
-
+const login = () => {
     return (
         <div>
-            <h2>Sign in with Google</h2>
-            <GoogleLogin
-                onSuccess={handleLoginSuccess}
-                onError={handleLoginFailure}
-            />
+            <h1>Login</h1>
+            <input name="login" placeholder="Login" className="inputElement"/>
+            <input name="password" type="password" placeholder="Password" className="inputElement" />
+            <Button className="button">Login</Button>
         </div>
     );
 };
 
-export default Login;
+export default login;
