@@ -7,8 +7,8 @@ const NavigationBar = () => {
         <nav className="navBar">
             <img src={logo} alt="logo" className="logo" />
             <div className="desktopMenu">
-                <Link to="/" className="desktopMenuListItem">Strona startowa</Link>
-                <Link to="/login" className="desktopMenuListItem">Zaloguj</Link>
+                <Link to="/" className="desktopMenuListItem">Home</Link>
+                <Link to="/login" className="desktopMenuListItem">Login</Link>
             </div>
         </nav>
     );
