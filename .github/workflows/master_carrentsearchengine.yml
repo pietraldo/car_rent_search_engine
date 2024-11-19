@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING_WYSZUKIWARKA }}
+      DB_CONNECTION_STRING_WYSZUKIWARKA: ${{ secrets.DB_CONNECTION_STRING_WYSZUKIWARKA }}
 
     steps:
       # Checkout the repository
