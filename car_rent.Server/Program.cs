@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+<<<<<<< HEAD
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddCors(options =>
 {
@@ -20,6 +21,10 @@ builder.Services.AddCors(options =>
         });
 });
 
+=======
+builder.Configuration.AddEnvironmentVariables();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
+>>>>>>> cac591ebe7401e2e9d5bdc12b68f976454000104
 builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 var app = builder.Build();
