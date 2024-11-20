@@ -5,6 +5,7 @@ import Element from './components/Element/Element';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Login from './pages/login/login';
+import BookingDatePicker from './components/BookingDatePicker/BookingDatePicker';
 function App() {
     const [cars, setCars] = useState([]); // All cars fetched from the backend
     const [filteredCars, setFilteredCars] = useState([]); // Cars after filtering
@@ -206,8 +207,10 @@ function App() {
                                 </div>
                             )}
                         </div>
+                        <BookingDatePicker className="filter-group" />
                     </div>
                 )
+                  
             )}
 
             <TransitionGroup>
