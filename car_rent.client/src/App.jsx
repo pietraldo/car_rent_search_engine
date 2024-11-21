@@ -5,6 +5,10 @@ import Element from './components/Element/Element';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import Login from './pages/login/login';
+import BookingDatePicker from './components/BookingDatePicker/BookingDatePicker';
+import Filter from './components/Filter/Filter'
+import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric/CollapsibleSectionGeneric';
+
 function App() {
     const [cars, setCars] = useState([]); // All cars fetched from the backend
     const [filteredCars, setFilteredCars] = useState([]); // Cars after filtering
@@ -15,6 +19,16 @@ function App() {
     const apiUrl = import.meta.env.VITE_API_URL;
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1); 
+    const carsPerPage = 5; 
+
+    // Update selected values
+    const handleToggleSelection = (value, selectedValues, setSelectedValues) => {
+        if (selectedValues.includes(value)) {
+            setSelectedValues(selectedValues.filter((item) => item !== value));
+        } else {
+            setSelectedValues([...selectedValues, value]);
+        }
     const [isFilterVisible, setIsFilterVisible] = useState({
         brands: false,
         models: false,
@@ -40,8 +54,7 @@ function App() {
     // Fetch car data from the API
     async function getCars() {
         try {
-            const response = await fetch(`${apiUrl}/Car`);
-            console.log(`${apiUrl}`);
+            const response = await fetch(`/Car`);
             if (!response.ok) {
                 throw new Error('Failed to fetch car data.');
             }
@@ -82,24 +95,35 @@ function App() {
         }
 
         setFilteredCars(filtered);
+        setCurrentPage(1);
     }, [selectedBrands, selectedModels, selectedYears, selectedColors, cars]);
 
-    // Handle checkbox changes
-    const handleCheckboxChange = (value, selectedValues, setSelectedValues) => {
-        if (selectedValues.includes(value)) {
-            setSelectedValues(selectedValues.filter(item => item !== value)); // Remove the value
-        } else {
-            setSelectedValues([...selectedValues, value]); // Add the value
-        }
+    const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    const startIndex = (currentPage - 1) * carsPerPage;
+    const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
     };
 
     const contents = filteredCars.length === 0
         ? <p><em>No cars available. Try adjusting the filters.</em></p>
         : (
             <div>
-                {filteredCars.map((car) => (
+                {currentCars.map((car) => (
                     <Element key={car.id} car={car} apiUrl={apiUrl} />
                 ))}
+                {/* Pagination Controls */}
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={currentPage === i + 1 ? "active" : ""}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
             </div>
         );
 
@@ -107,107 +131,56 @@ function App() {
         <div>
             <NavigationBar />
 
-            {/* Filters Section */}
             {location.pathname === "/" && (
                 isLoading ? (
                     <p>Loading filters...</p>
                 ) : (
-                    <div className="filters">
-                        <h2>Filter by:</h2>
+                        <div className="filters">
+                            <h2>Filter by:</h2>
 
-                        {/* Brands Filter */}
-                        <div className="filter-group">
-                            <button onClick={() => toggleFilterVisibility("brands")}>
-                                {isFilterVisible.brands ? "Hide Brands" : "Show Brands"}
-                            </button>
-                            {isFilterVisible.brands && (
-                                <div className="filter-option-container">
-                                    {uniqueBrands.map(brand => (
-                                        <div key={brand} className="filter-element-wrapper">
-                                            <input
-                                                className="filter-element"
-                                                type="checkbox"
-                                                value={brand}
-                                                checked={selectedBrands.includes(brand)}
-                                                onChange={() =>
-                                                    handleCheckboxChange(brand, selectedBrands, setSelectedBrands)
-                                                }
-                                            />
-                                            <label>{brand}</label>
-                                        </div>
-                                        ))}
-                                </div>
-                            )}
-                        </div>
+                            {/* Filters */}
+                            <CollapsibleSectionGeneric title="Brands">
+                                <Filter
+                                    options={uniqueBrands}
+                                    selectedValues={selectedBrands}
+                                    onToggle={(brand) =>
+                                        handleToggleSelection(brand, selectedBrands, setSelectedBrands)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Models">
+                                <Filter
+                                    options={uniqueModels}
+                                    selectedValues={selectedModels}
+                                    onToggle={(model) =>
+                                        handleToggleSelection(model, selectedModels, setSelectedModels)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Years">
+                                <Filter
+                                    options={uniqueYears}
+                                    selectedValues={selectedYears}
+                                    onToggle={(year) =>
+                                        handleToggleSelection(year, selectedYears, setSelectedYears)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Colors">
+                                <Filter
+                                    options={uniqueColors}
+                                    selectedValues={selectedColors}
+                                    onToggle={(color) =>
+                                        handleToggleSelection(color, selectedColors, setSelectedColors)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
 
-                        {/* Models Filter */}
-                        <div className="filter-group">
-                            <button onClick={() => toggleFilterVisibility("models")}>
-                                {isFilterVisible.models ? "Hide Models" : "Show Models"}
-                            </button>
-                            {isFilterVisible.models && (
-                                <div className="filter-option-container">
-                                    {uniqueModels.map(model => (
-                                        <div key={model} className="filter-element-wrapper">
-                                            <input
-                                                className="filter-element"
-                                                type="checkbox"
-                                                value={model}
-                                                checked={selectedModels.includes(model)}
-                                                onChange={() => handleCheckboxChange(model, selectedModels, setSelectedModels)}
-                                            />
-                                            <label> {model} </label>
-                                        </div>
-                                    ))}
-                                </div>
-                                )}
+                            {/* Booking Date Picker */}
+                            <CollapsibleSectionGeneric title="Booking Dates">
+                                <BookingDatePicker />
+                            </CollapsibleSectionGeneric>
                         </div>
-                        {/* Years Filter */}
-                        <div className="filter-group">
-                            <button onClick={() => toggleFilterVisibility("years")}>
-                                {isFilterVisible.years ? "Hide Years" : "Show Years"}
-                            </button>
-                            {isFilterVisible.years && (
-                                <div className="filter-option-container">
-                                    {uniqueYears.map(year => (
-                                        <div key={year} className="filter-element-wrapper">
-                                            <input
-                                                className="filter-element"
-                                                type="checkbox"
-                                                value={year}
-                                                checked={selectedYears.includes(year)}
-                                                onChange={() => handleCheckboxChange(year, selectedYears, setSelectedYears)}
-                                            />
-                                            <label> {year} </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Colors Filter */}
-                        <div className="filter-group">
-                            <button onClick={() => toggleFilterVisibility("colors")}>
-                                {isFilterVisible.colors ? "Hide Colors" : "Show Colors"}
-                            </button>
-                            {isFilterVisible.colors && (
-                                <div className="filter-option-container">
-                                    {uniqueColors.map(color => (
-                                        <div key={color} className="filter-element-wrapper">
-                                            <input
-                                                className="filter-element"
-                                                type="checkbox"
-                                                value={color}
-                                                checked={selectedColors.includes(color)}
-                                                onChange={() => handleCheckboxChange(color, selectedColors, setSelectedColors)}
-                                            />
-                                            <label> {color} </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 )
             )}
 
@@ -223,7 +196,6 @@ function App() {
     );
 }
 
-// Wrap your App with Router in your index.js or main file
 export default function AppWrapper() {
     return (
         <Router>
