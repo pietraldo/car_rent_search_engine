@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,8 +22,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Configuration.AddEnvironmentVariables();
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
-builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
+//var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
+var connectionString = "Server = ANDRUT; Database = SearchEngineDatabase; Trusted_Connection = True; TrustServerCertificate = True;";
+builder.Services.AddDbContext<car_rent.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 

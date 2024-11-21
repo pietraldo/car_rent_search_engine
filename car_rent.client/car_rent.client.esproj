@@ -10,5 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\components\Filter\" />
+    <Folder Include="src\components\AuthProvider\" />
   </ItemGroup>
 </Project>

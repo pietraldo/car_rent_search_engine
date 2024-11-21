@@ -3,4 +3,7 @@
 GET {{car_rent.Server_HostAddress}}/cars/
 Accept: application/json
 
+POST {{car_rent.Server_HostAddress}}/rent/
+Accept: application/json
+
 ###

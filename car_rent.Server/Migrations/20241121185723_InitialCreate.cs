@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace car_rent.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class second : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,9 @@ namespace car_rent.Server.Migrations
                     Offer_ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Price = table.Column<double>(type: "float", nullable: false),
-                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Client_ID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,8 +100,7 @@ namespace car_rent.Server.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_History_Company_ID",
                 table: "History",
-                column: "Company_ID",
-                unique: true);
+                column: "Company_ID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_History_Offer_ID",

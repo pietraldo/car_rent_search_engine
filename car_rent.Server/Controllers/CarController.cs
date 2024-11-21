@@ -6,8 +6,6 @@ namespace car_rent.Server.Controllers
     [Route("[controller]")]
     public class CarController : ControllerBase
     {
-
-
         public CarController()
         {
 

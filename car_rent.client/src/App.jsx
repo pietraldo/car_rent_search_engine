@@ -100,6 +100,7 @@ function App() {
                 <div>
                     {currentCars.map((car) => (
                         <Element key={car.id} car={car} apiUrl={apiUrl} />
+
                     ))}
                     {/* Pagination Controls */}
                     <div className="pagination">

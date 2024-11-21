@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using car_rent_api2.Server.Database;
+using car_rent.Server.Database;
 
 #nullable disable
 
 namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
-    [Migration("20241119183510_second")]
-    partial class second
+    [Migration("20241121185723_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace car_rent.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Company", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Company", b =>
                 {
                     b.Property<int>("Company_ID")
                         .ValueGeneratedOnAdd()
@@ -42,7 +42,7 @@ namespace car_rent.Server.Migrations
                     b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Offer", b =>
                 {
                     b.Property<int>("Offer_ID")
                         .ValueGeneratedOnAdd()
@@ -50,19 +50,24 @@ namespace car_rent.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Offer_ID"));
 
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Client_ID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Offer_ID");
 
                     b.ToTable("Offers");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Rent", b =>
                 {
                     b.Property<int>("Rent_ID")
                         .ValueGeneratedOnAdd()
@@ -91,8 +96,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Rent_ID");
 
-                    b.HasIndex("Company_ID")
-                        .IsUnique();
+                    b.HasIndex("Company_ID");
 
                     b.HasIndex("Offer_ID")
                         .IsUnique();
@@ -102,7 +106,7 @@ namespace car_rent.Server.Migrations
                     b.ToTable("History");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.User", b =>
+            modelBuilder.Entity("car_rent.Server.Database.User", b =>
                 {
                     b.Property<int>("User_ID")
                         .ValueGeneratedOnAdd()
@@ -149,21 +153,21 @@ namespace car_rent.Server.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Rent", b =>
                 {
-                    b.HasOne("car_rent_api2.Server.Database.Company", "Company")
-                        .WithOne("Rent")
-                        .HasForeignKey("car_rent_api2.Server.Database.Rent", "Company_ID")
+                    b.HasOne("car_rent.Server.Database.Company", "Company")
+                        .WithMany("Rents")
+                        .HasForeignKey("Company_ID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("car_rent_api2.Server.Database.Offer", "Offer")
+                    b.HasOne("car_rent.Server.Database.Offer", "Offer")
                         .WithOne("Rent")
-                        .HasForeignKey("car_rent_api2.Server.Database.Rent", "Offer_ID")
+                        .HasForeignKey("car_rent.Server.Database.Rent", "Offer_ID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("car_rent_api2.Server.Database.User", "User")
+                    b.HasOne("car_rent.Server.Database.User", "User")
                         .WithMany("Rents")
                         .HasForeignKey("User_ID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -176,19 +180,17 @@ namespace car_rent.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Company", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Company", b =>
                 {
-                    b.Navigation("Rent")
-                        .IsRequired();
+                    b.Navigation("Rents");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
+            modelBuilder.Entity("car_rent.Server.Database.Offer", b =>
                 {
-                    b.Navigation("Rent")
-                        .IsRequired();
+                    b.Navigation("Rent");
                 });
 
-            modelBuilder.Entity("car_rent_api2.Server.Database.User", b =>
+            modelBuilder.Entity("car_rent.Server.Database.User", b =>
                 {
                     b.Navigation("Rents");
                 });

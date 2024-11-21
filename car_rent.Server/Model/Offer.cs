@@ -1,10 +1,13 @@
-﻿namespace car_rent_api2.Server.Database
+﻿namespace car_rent.Server.Database
 {
     public class Offer
     {
         public int Offer_ID { get; set; }
         public double Price { get; set; }
-        public string Brand { get; set; }
-        public Rent Rent { get; set; }
+        public Car Car;
+        public Rent? Rent { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Client_ID { get; set; }
     }
 }

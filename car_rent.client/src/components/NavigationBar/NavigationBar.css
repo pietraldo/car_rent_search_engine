@@ -12,9 +12,10 @@
     z-index: 3;
     max-width: 75rem;
     border-radius: 8px;
-} 
+}
 
 .desktopMenuListItem {
+    all: unset;
     margin: 1rem;
     cursor: pointer;
     color: black;
@@ -24,6 +25,9 @@
         color: yellow;
         padding-bottom: 0.5rem;
         border-bottom: 3px solid yellow;
+    }
+    .desktopMenuListItem:focus {
+        outline: none;
     }
 
 .desktopMenuImg {

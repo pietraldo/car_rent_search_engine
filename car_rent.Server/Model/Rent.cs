@@ -1,4 +1,4 @@
-﻿namespace car_rent_api2.Server.Database
+﻿namespace car_rent.Server.Database
 {
     public class Rent
     {

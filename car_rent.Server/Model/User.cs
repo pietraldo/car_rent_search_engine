@@ -1,4 +1,4 @@
-﻿namespace car_rent_api2.Server.Database
+﻿namespace car_rent.Server.Database
 {
     public class User
     {
@@ -14,5 +14,6 @@
         public DateTime Date_of_birth { get; set; }
         // Navigation property
         public ICollection<Rent> Rents { get; set; }
+        //public ICollection<Offer> Offers { get; set; }
     }
 }
