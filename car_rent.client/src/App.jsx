@@ -72,8 +72,13 @@ function App()
                 throw new Error('Failed to fetch car data.');
             }
             const data = await response.json();
-            setCars(data);
-            setFilteredCars(data);
+            const cars = data.map(offer =>
+            {
+                offer.car.offerId = offer.id;
+                return offer.car;
+            });
+            setCars(cars);
+            setFilteredCars(cars);
         } catch (error)
         {
             console.error('Error fetching cars:', error);

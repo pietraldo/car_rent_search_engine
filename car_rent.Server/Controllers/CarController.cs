@@ -2,6 +2,7 @@ using car_rent_api2.Server.Database;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Text.Json;
+using car_rent.Server.Model;
 
 namespace car_rent.Server.Controllers
 {
@@ -11,14 +12,16 @@ namespace car_rent.Server.Controllers
     {
 
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl = "https://localhost:7083";  // External API URL
-        public CarController(HttpClient httpClient)
+        private readonly string _apiUrl; 
+                                                                    
+        public CarController(HttpClient httpClient, string car_rent_company_api1)
         {
             _httpClient = httpClient;
+            _apiUrl = car_rent_company_api1;
         }
 
         [HttpGet(Name = "GetCars")]
-        public async Task<ActionResult<IEnumerable<Car>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
+        public async Task<ActionResult<IEnumerable<OfferToDisplay>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
         {
             int clientId = 0;
             var requestUrl = $"{_apiUrl}/api/offer?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&brand={search_brand}&model={search_model}&clientId={clientId}";
@@ -29,7 +32,7 @@ namespace car_rent.Server.Controllers
                 var responseContent = await _httpClient.GetStringAsync(requestUrl);
 
 
-                List<Car> cars = new List<Car>();
+                List<OfferToDisplay> offersToDisplay = new List<OfferToDisplay>();
 
                 using (JsonDocument doc = JsonDocument.Parse(responseContent))
                 {
@@ -47,11 +50,21 @@ namespace car_rent.Server.Controllers
 
                         // Create a new Car object and add it to the list
                         Car carObj = new (model, brand, year, color, picture);
-                        cars.Add(carObj);
+
+                        OfferToDisplay offerToDisplay = new OfferToDisplay
+                        {
+                            Id = Guid.Parse(offer.GetProperty("id").GetString()),
+                            Car = carObj,
+                            ClientId = offer.GetProperty("clientId").GetInt32(),
+                            Price = offer.GetProperty("price").GetDouble(),
+                            StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
+                            EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
+                        };
+                        offersToDisplay.Add(offerToDisplay);
                     }
                 }
 
-                return Ok(cars);
+                return Ok(offersToDisplay);
             }
             catch (Exception ex)
             {
@@ -68,5 +81,31 @@ namespace car_rent.Server.Controllers
 
             return [car1, car2, car3];
         }
+
+        [HttpGet("sendEmail/{offerId}")]
+        public async Task<ActionResult<string>> SendEmail(string offerId)
+        {
+            //TODO: if user not logged in return failure
+
+            //TODO: Implement sending an email
+
+            string url = $"{Request.Scheme}://{Request.Host}";
+
+            // Build the confirmation link
+            string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
+
+            Console.WriteLine(confirmationLink);
+            return Ok(confirmationLink);
+        }
+
+        [HttpGet("confirmationLink/{offerId}")]
+        public async Task<ActionResult> ConfirmationLink(string offerId)
+        {
+            // TODO: Get user id
+
+            var response=await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentcar/{offerId}");
+            return Ok(response);
+        }
+
     }
 }
