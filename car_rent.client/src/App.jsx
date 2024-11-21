@@ -29,6 +29,18 @@ function App() {
         } else {
             setSelectedValues([...selectedValues, value]);
         }
+    const [isFilterVisible, setIsFilterVisible] = useState({
+        brands: false,
+        models: false,
+        years: false,
+        colors: false
+    });
+
+    const toggleFilterVisibility = (filter) => {
+        setIsFilterVisible(prevState => ({
+            ...prevState,
+            [filter]: !prevState[filter] // Toggle visibility for the selected filter group
+        }));
     };
     useEffect(() => {
         async function fetchCars() {
@@ -46,21 +58,9 @@ function App() {
             if (!response.ok) {
                 throw new Error('Failed to fetch car data.');
             }
-            console.log(response);
             const data = await response.json();
-
-            const quadrupledData = Array(4)
-                .fill(data)
-                .flat()
-                .map((car, index) => ({
-                    ...car,
-                    id: `${car.id}-${index}`, // Ensure unique IDs for duplicated cars
-                }));
-
-            setCars(quadrupledData);
-            setFilteredCars(quadrupledData);
-            //setCars(data);
-            //setFilteredCars(data);
+            setCars(data);
+            setFilteredCars(data);
         } catch (error) {
             console.error('Error fetching cars:', error);
             setCars([]);
@@ -105,7 +105,6 @@ function App() {
         setCurrentPage(page);
     };
 
-    
     const contents = filteredCars.length === 0
         ? <p><em>No cars available. Try adjusting the filters.</em></p>
         : (
@@ -131,6 +130,7 @@ function App() {
     return (
         <div>
             <NavigationBar />
+
             {location.pathname === "/" && (
                 isLoading ? (
                     <p>Loading filters...</p>
@@ -183,6 +183,7 @@ function App() {
                         </div>
                 )
             )}
+
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
                     <Routes location={location}>

@@ -9,7 +9,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -25,6 +24,8 @@ builder.Configuration.AddEnvironmentVariables();
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
 builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
