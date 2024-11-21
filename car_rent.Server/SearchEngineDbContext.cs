@@ -8,7 +8,9 @@ namespace car_rent_api2.Server.Database
         public DbSet<Rent> History { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Company>  Companies { get; set; }
-       
+
+        public SearchEngineDbContext(DbContextOptions<SearchEngineDbContext> options) : base(options) { }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Primary keys for the tabels
@@ -43,6 +45,6 @@ namespace car_rent_api2.Server.Database
 
 
         }
-        public SearchEngineDbContext(DbContextOptions<SearchEngineDbContext> options) : base(options) { }
+      
     }
 }

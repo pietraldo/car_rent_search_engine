@@ -36,7 +36,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Company_ID");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
@@ -56,7 +56,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Offer_ID");
 
-                    b.ToTable("Offers");
+                    b.ToTable("Offers", (string)null);
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
@@ -96,7 +96,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasIndex("User_ID");
 
-                    b.ToTable("History");
+                    b.ToTable("History", (string)null);
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.User", b =>
@@ -143,7 +143,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("User_ID");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
