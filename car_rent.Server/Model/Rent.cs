@@ -1,4 +1,6 @@
-﻿namespace car_rent.Server.Database
+﻿using car_rent.Server.Model;
+
+namespace car_rent.Server.Database
 {
     public class Rent
     {
@@ -13,6 +15,7 @@
         public User User { get; set; }
         public Offer Offer { get; set; }
         public Company Company { get; set; }
+        public Car Car { get; set; }
 
     }
 }

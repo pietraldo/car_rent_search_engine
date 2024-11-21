@@ -6,4 +6,6 @@ Accept: application/json
 POST {{car_rent.Server_HostAddress}}/rent/
 Accept: application/json
 
+GET {{car_rent.Server_HostAddress}}/history/
+Accept: application/json
 ###

@@ -8,6 +8,7 @@ namespace car_rent.Server.Database
         public DbSet<Rent> History { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<car_rent.Server.Model.Car> Cars { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,8 @@ namespace car_rent.Server.Database
                 .HasKey(offer => offer.Offer_ID);
             modelBuilder.Entity<Company>()
                 .HasKey(company => company.Company_ID);
+            modelBuilder.Entity<car_rent.Server.Model.Car>()
+                .HasKey(car => car.Car_ID);
 
             // Foreign keys for the tabels
 
@@ -29,24 +32,24 @@ namespace car_rent.Server.Database
                 .WithMany(user => user.Rents)
                 .HasForeignKey(rent => rent.User_ID);
 
-            // one-to-one history-offer
+            // one-to-one rent-offer
             modelBuilder.Entity<Rent>()
                 .HasOne(rent => rent.Offer)
                 .WithOne(offer => offer.Rent)
                 .HasForeignKey<Rent>(rent => rent.Offer_ID);
 
-            // one-to-many history-company
+            // one-to-many rent-company
             modelBuilder.Entity<Rent>()
                 .HasOne(rent => rent.Company)
                 .WithMany(company => company.Rents)
                 .HasForeignKey(rent => rent.Company_ID);
 
-            //// one-to-many offer-user
-            //modelBuilder.Entity<Offer>()
-            //    .HasOne(offer => offer.User)
-            //    .WithMany(user => user.Offers)
-            //    .HasForeignKey(offer => offer.Client_ID);
-                
+            // one-to-many offer-car
+            modelBuilder.Entity<Offer>()
+                .HasOne(offer => offer.Car)
+                .WithMany(car => car.Offers)
+                .HasForeignKey(offer => offer.Car_ID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public SearchEngineDbContext(DbContextOptions<SearchEngineDbContext> options) : base(options) { }
     }

@@ -8,6 +8,7 @@ import Login from './pages/login/login';
 import BookingDatePicker from './components/BookingDatePicker/BookingDatePicker';
 import Filter from './components/Filter/Filter'
 import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric/CollapsibleSectionGeneric';
+import History from './pages/history/history'
 
 function App() {
     const [cars, setCars] = useState([]); // All cars fetched from the backend
@@ -177,8 +178,9 @@ function App() {
                 <TransitionGroup>
                     <CSSTransition key={location.key} classNames="fade" timeout={300}>
                         <Routes location={location}>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/" element={<div>{contents}</div>} />
+                            <Route path="/login" element={ <Login /> } />
+                            <Route path="/" element={<div>{contents} </div>} />
+                            <Route path="/history" element={ <History/> } />
                         </Routes>
                     </CSSTransition>
                 </TransitionGroup>

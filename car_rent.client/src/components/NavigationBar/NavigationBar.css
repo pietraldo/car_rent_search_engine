@@ -1,17 +1,19 @@
 ﻿.navBar {
     background: linear-gradient(85deg, rgba(2,0,36,1) 0%, rgba(19,62,135,1) 57%, rgba(0,212,255,1) 100%);
     height: 5rem;
-    width: 100%;
-    margin: 0 auto;
+    width: 95%;
+    margin-bottom: 10%;
+    margin-right: 5%;
     padding: 1rem 2rem;
     display: flex;
-    align-content: center;
+    align-items: center; /* Center the items vertically */
     justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 3;
-    max-width: 75rem;
-    border-radius: 8px;
+    position: fixed; /* Ensure the navbar stays fixed at the top */
+    top: 0; /* Align it to the top of the page */
+    z-index: 3; /* Make sure the navbar stays above other elements */
+    max-width: 100%; /* Allow navbar to take full width */
+    border-radius: 8px; /* No rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for better separation */
 }
 
 .desktopMenuListItem {
@@ -26,6 +28,7 @@
         padding-bottom: 0.5rem;
         border-bottom: 3px solid yellow;
     }
+
     .desktopMenuListItem:focus {
         outline: none;
     }
@@ -52,7 +55,6 @@
         transition: 300ms ease-in-out;
         background: yellow;
     }
-
 
 .logo {
     height: 10vh;

@@ -43,6 +43,7 @@ const NavigationBar = () => {
             <img src={logo} alt="logo" className="logo" />
             <div className="desktopMenu">
                 <Link to="/" className="desktopMenuListItem">Home</Link>
+                <Link to="/history" className="desktopMenuListItem">History</Link>
                 {isLoggedIn ? (
                     <button className="desktopMenuListItem" onClick={logout}>Logout</button>
                 ) : (

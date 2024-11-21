@@ -1,3 +1,5 @@
+using car_rent.Server.Database;
+using car_rent.Server.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace car_rent.Server.Controllers
@@ -6,9 +8,10 @@ namespace car_rent.Server.Controllers
     [Route("[controller]")]
     public class CarController : ControllerBase
     {
-        public CarController()
+        private readonly SearchEngineDbContext _context;
+        public CarController(SearchEngineDbContext context)
         {
-
+            _context = context;
         }
 
         [HttpGet(Name = "GetCars")]
@@ -19,7 +22,7 @@ namespace car_rent.Server.Controllers
             Car car3 = new("Doc Hudson", "Hudson Hornet", 1951, "Dark Blue", "doc_hudson.jpg");
             Car car4 = new("Sally Carrera", "Porsche 911", 2002, "Blue", "sally.jpg");
             Car car5 = new("Ramone", "Chevrolet Impala", 1959, "Purple with Flames", "ramone.jpg");
-
+            
             return [car1, car2, car3, car4, car5];
         }
         [HttpGet("get-cars2", Name = "GetCars2")]

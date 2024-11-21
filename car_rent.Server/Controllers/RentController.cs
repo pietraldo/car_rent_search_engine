@@ -33,7 +33,7 @@ namespace car_rent.Server.Controllers
                 Offer_ID = rentRequest.Offer_ID,
             };
 
-            
+       
             _context.History.Add(rent);
             await _context.SaveChangesAsync();
 

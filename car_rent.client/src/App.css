@@ -1,11 +1,14 @@
 ﻿#root {
-    margin: 0 auto;
+    margin: 0 0;
     text-align: center;
     background: rgb(255,250,250);
     color: black;
     font-family: Roboto, sans-serif;
+    margin-left: 1%;
 }
-
+body {
+    padding-top: 6rem; /* This should match the height of your navbar */
+}
 
 fade-enter {
     opacity: 0;
@@ -38,14 +41,15 @@ fade-enter {
 /* Button styling */
 .filters {
     display: flex;
-    flex-direction: row; /* Stack filters vertically for better alignment */
-/*    gap: 1rem;*/
+    flex-direction: row; /* Stack filters horizontally */
     background-color: #f9f9f9;
-/*    padding: rem;*/
+    padding: 1rem; /* Add some padding */
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 100%;
-    margin: 2rem auto;
+    width: 95%; /* Same width as navbar */
+    margin-top: 100vw; /* Add margin to avoid overlap with navbar */
+    margin-left: auto;
+    margin-right: auto; /* Center align the filters */
 }
 
     .filters h2 {
