@@ -41,11 +41,13 @@ function App() {
     // Fetch car data from the API
     async function getCars() {
         try {
-            const response = await fetch(`${apiUrl}/Car`);
+            const response = await fetch(`/Car`);
             if (!response.ok) {
                 throw new Error('Failed to fetch car data.');
             }
+            console.log(response);
             const data = await response.json();
+         
             setCars(data);
             setFilteredCars(data);
         } catch (error) {
