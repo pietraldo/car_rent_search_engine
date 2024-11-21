@@ -35,3 +35,199 @@ fade-enter {
 .reserve {
     margin-left: 20px; /* Optional: Add some space between SearchBar and Reserve */
 }
+/* Button styling */
+.filters {
+    display: flex;
+    flex-direction: row; /* Stack filters vertically for better alignment */
+/*    gap: 1rem;*/
+    background-color: #f9f9f9;
+/*    padding: rem;*/
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    margin: 2rem auto;
+}
+
+    .filters h2 {
+        width: 5rem; /* Matches the toggle-button width */
+        height: 3rem; /* Matches the toggle-button height */
+        padding: 0.5rem 1rem; /* Similar padding */
+        border: 1px solid #ddd; /* Adds border */
+        border-radius: 8px; /* Rounds the edges */
+        background-color: #fff; /* Matches background color */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Similar box-shadow */
+        font-size: 0.9rem;
+        line-height: 2rem; /* Ensures text is vertically aligned */
+        color: #333; /* Matches text color */
+        display: inline-flex; /* Aligns text nicely within the element */
+        align-items: center; /* Centers text vertically */
+        justify-content: center; /* Centers text horizontally */
+    }
+.filter-group button {
+    width: 12rem; /* Ensure dropdowns have enough width */
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    cursor: pointer;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+    background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1l4 4 4-4" stroke="%23333" stroke-width="1.5" fill="none" fill-rule="evenodd"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 0.65rem;
+}
+
+.filter-element {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none; /* Remove default checkbox styling */
+}
+    .filter-element:hover {
+        border-color: #888;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-element:focus {
+        border-color: #0056b3;
+        box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.25);
+    }
+
+    /* Checked State */
+    .filter-element:checked {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="none" stroke="%23fff" stroke-width="2" d="M4 8l2 2 6-6"/%3E%3C/svg%3E');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 60%;
+    }
+/* Checkbox Label Styling */
+label {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #333;
+    margin-right: auto;
+    cursor: pointer;
+    gap: 0.75rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Animation for Appearance */
+.filter-element {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+.filter-option-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    background-color: #fff; /* White background */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Dropdown shadow */
+    gap: 0.5rem; /* Space between options */
+    max-width: 300px; /* Optional: restrict max width */
+}
+
+/* Individual Option Styling */
+.filter-element-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between checkbox and label text */
+    padding: 0.5rem; /* Space inside each option */
+    border: 1px solid transparent; /* Default border for separation */
+    border-radius: 6px; /* Rounded edges for options */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+    /* Hover Effect for Options */
+    .filter-element-wrapper:hover {
+        background-color: #f0f8ff; /* Light blue hover background */
+        border-color: #0056b3; /* Highlight border */
+    }
+
+/* Active State (When Checked) */
+.filter-element:checked + label {
+    font-weight: bold;
+    color: #0056b3; /* Highlight selected label */
+}
+
+/* Optional Transition Animation for Appearance */
+.filter-option-container {
+    animation: dropdownFade 0.3s ease;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+    .pagination button {
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        .pagination button.active {
+            background-color: #0056b3;
+            color: #fff;
+            font-weight: bold;
+        }
+
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Adjustment */
+@media (max-width: 768px) {
+    .filter-option-container {
+        width: 100%; /* Full width on small screens */
+        max-width: none;
+    }
+}

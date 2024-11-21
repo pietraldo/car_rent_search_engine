@@ -2,83 +2,193 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import NavigationBar from './components/NavigationBar/NavigationBar';
 import Element from './components/Element/Element';
-//<<<<<<< HEAD
-//import Login from './pages/login/login'; // Ensure this path is correct
-//import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-//import { CSSTransition, TransitionGroup } from 'react-transition-group';
-//=======
-import Filter from './components/Filter/Filter';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Login from './pages/login/login'; // Ensure this path is correct
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import Calendar from "react-calendar"
-/*>>>>>>> origin/master*/
-import Reserve from './pages/reserve/reserve'
-import SearchBar from './components/SearchBar/SearchBar';
-
+import Login from './pages/login/login';
+import BookingDatePicker from './components/BookingDatePicker/BookingDatePicker';
+import Filter from './components/Filter/Filter'
+import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric/CollapsibleSectionGeneric';
 
 function App() {
-    const [cars, setCars] = useState([]);
-    const [filteredCars, setFilteredCars] = useState([]);
-    const [selectedModel, setSelectedModel] = useState(null);
+    const [cars, setCars] = useState([]); // All cars fetched from the backend
+    const [filteredCars, setFilteredCars] = useState([]); // Cars after filtering
+    const [selectedBrands, setSelectedBrands] = useState([]); // Selected brands
+    const [selectedModels, setSelectedModels] = useState([]); // Selected models
+    const [selectedYears, setSelectedYears] = useState([]); // Selected years
+    const [selectedColors, setSelectedColors] = useState([]); // Selected colors
     const apiUrl = import.meta.env.VITE_API_URL;
-    console.log(apiUrl);
+    const location = useLocation();
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1); 
+    const carsPerPage = 5; 
 
+    // Update selected values
+    const handleToggleSelection = (value, selectedValues, setSelectedValues) => {
+        if (selectedValues.includes(value)) {
+            setSelectedValues(selectedValues.filter((item) => item !== value));
+        } else {
+            setSelectedValues([...selectedValues, value]);
+        }
+    const [isFilterVisible, setIsFilterVisible] = useState({
+        brands: false,
+        models: false,
+        years: false,
+        colors: false
+    });
+
+    const toggleFilterVisibility = (filter) => {
+        setIsFilterVisible(prevState => ({
+            ...prevState,
+            [filter]: !prevState[filter] // Toggle visibility for the selected filter group
+        }));
+    };
     useEffect(() => {
-        getCars();
+        async function fetchCars() {
+            setIsLoading(true);
+            await getCars();
+            setIsLoading(false);
+        }
+        fetchCars();
     }, []);
 
+    // Fetch car data from the API
     async function getCars() {
         try {
-            const response = await fetch('Car');
+            const response = await fetch(`/Car`);
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Failed to fetch car data.');
             }
             const data = await response.json();
             setCars(data);
+            setFilteredCars(data);
         } catch (error) {
             console.error('Error fetching cars:', error);
+            setCars([]);
+            setFilteredCars([]);
         }
     }
 
-    const uniqueModels = [...new Set(cars.map(car => car.model))];
+    // Extract unique options for filters
+    const uniqueBrands = cars.length > 0 ? [...new Set(cars.map(car => car.brand))] : [];
+    const uniqueModels = cars.length > 0 ? [...new Set(cars.map(car => car.model))] : [];
+    const uniqueYears = cars.length > 0 ? [...new Set(cars.map(car => car.year))] : [];
+    const uniqueColors = cars.length > 0 ? [...new Set(cars.map(car => car.color))] : [];
 
+    // Filter cars based on selected options
+    useEffect(() => {
+        let filtered = cars;
 
-    const contents = (selectedModel ? filteredCars : cars).length === 0
-        ? <p><em>Loading... Car data should be here if backend starts</em></p>
+        if (selectedBrands.length > 0) {
+            filtered = filtered.filter(car => selectedBrands.includes(car.brand));
+        }
+
+        if (selectedModels.length > 0) {
+            filtered = filtered.filter(car => selectedModels.includes(car.model));
+        }
+
+        if (selectedYears.length > 0) {
+            filtered = filtered.filter(car => selectedYears.includes(car.year));
+        }
+
+        if (selectedColors.length > 0) {
+            filtered = filtered.filter(car => selectedColors.includes(car.color));
+        }
+
+        setFilteredCars(filtered);
+        setCurrentPage(1);
+    }, [selectedBrands, selectedModels, selectedYears, selectedColors, cars]);
+
+    const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    const startIndex = (currentPage - 1) * carsPerPage;
+    const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const contents = filteredCars.length === 0
+        ? <p><em>No cars available. Try adjusting the filters.</em></p>
         : (
             <div>
-                {(selectedModel ? filteredCars : cars).map((car) => (
-                    <Element key={car.model} car={car} apiUrl={apiUrl} />
+                {currentCars.map((car) => (
+                    <Element key={car.id} car={car} apiUrl={apiUrl} />
                 ))}
+                {/* Pagination Controls */}
+                <div className="pagination">
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={currentPage === i + 1 ? "active" : ""}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+                </div>
             </div>
         );
-
-    const handleSelect = (model) => {
-        setSelectedModel(model);
-        if (model) {
-            setFilteredCars(cars.filter(car => car.model === model));
-        } else {
-            setFilteredCars(cars); // Show all if no filter is selected
-        }
-    };
 
     return (
         <div>
             <NavigationBar />
-            
+
+            {location.pathname === "/" && (
+                isLoading ? (
+                    <p>Loading filters...</p>
+                ) : (
+                        <div className="filters">
+                            <h2>Filter by:</h2>
+
+                            {/* Filters */}
+                            <CollapsibleSectionGeneric title="Brands">
+                                <Filter
+                                    options={uniqueBrands}
+                                    selectedValues={selectedBrands}
+                                    onToggle={(brand) =>
+                                        handleToggleSelection(brand, selectedBrands, setSelectedBrands)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Models">
+                                <Filter
+                                    options={uniqueModels}
+                                    selectedValues={selectedModels}
+                                    onToggle={(model) =>
+                                        handleToggleSelection(model, selectedModels, setSelectedModels)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Years">
+                                <Filter
+                                    options={uniqueYears}
+                                    selectedValues={selectedYears}
+                                    onToggle={(year) =>
+                                        handleToggleSelection(year, selectedYears, setSelectedYears)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric title="Colors">
+                                <Filter
+                                    options={uniqueColors}
+                                    selectedValues={selectedColors}
+                                    onToggle={(color) =>
+                                        handleToggleSelection(color, selectedColors, setSelectedColors)
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+
+                            {/* Booking Date Picker */}
+                            <CollapsibleSectionGeneric title="Booking Dates">
+                                <BookingDatePicker />
+                            </CollapsibleSectionGeneric>
+                        </div>
+                )
+            )}
+
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
                     <Routes location={location}>
                         <Route path="/login" element={<Login />} />
-                        <Route path="/" element={
-                            <div>
-                                <SearchBar />
-                                {contents}
-                            </div>} />
-                        <Route path="/reserve" element={<Reserve />} />
+                        <Route path="/" element={<div>{contents}</div>} />
                     </Routes>
                 </CSSTransition>
             </TransitionGroup>
@@ -86,7 +196,6 @@ function App() {
     );
 }
 
-// Wrap your App with Router in your index.js or main file
 export default function AppWrapper() {
     return (
         <Router>
