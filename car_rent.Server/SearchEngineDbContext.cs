@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace car_rent_api2.Server.Database
 {
-    public class SearchEngineDbContext : DbContext 
+    public class SearchEngineDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        public DbSet<User> Users { get; set; }
         public DbSet<Rent> History { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Company>  Companies { get; set; }
@@ -13,9 +13,8 @@ namespace car_rent_api2.Server.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Primary keys for the tabels
-            modelBuilder.Entity<User>()
-                .HasKey(user => user.User_ID);
+            base.OnModelCreating(modelBuilder);
+            
             modelBuilder.Entity<Rent>()
                 .HasKey(rent => rent.Rent_ID);
             modelBuilder.Entity<Offer>()

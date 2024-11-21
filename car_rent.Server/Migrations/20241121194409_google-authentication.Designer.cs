@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using car_rent_api2.Server.Database;
 
@@ -11,9 +12,11 @@ using car_rent_api2.Server.Database;
 namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
-    partial class SearchEngineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241121194409_google-authentication")]
+    partial class googleauthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,6 +166,7 @@ namespace car_rent.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -170,12 +174,13 @@ namespace car_rent.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DateOfBirth")
+                    b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DrivingLicenseIssueDate")
+                    b.Property<DateTime>("DrivingLicenseIssueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -186,12 +191,15 @@ namespace car_rent.Server.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HouseNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -254,7 +262,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Company_ID");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
@@ -274,7 +282,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Offer_ID");
 
-                    b.ToTable("Offers", (string)null);
+                    b.ToTable("Offers");
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
@@ -314,7 +322,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasIndex("User_ID");
 
-                    b.ToTable("History", (string)null);
+                    b.ToTable("History");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using car_rent_api2.Server.Database;
 
@@ -11,9 +12,11 @@ using car_rent_api2.Server.Database;
 namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
-    partial class SearchEngineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241121195105_google-authentication-1")]
+    partial class googleauthentication1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,7 +257,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Company_ID");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
@@ -274,7 +277,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasKey("Offer_ID");
 
-                    b.ToTable("Offers", (string)null);
+                    b.ToTable("Offers");
                 });
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
@@ -314,7 +317,7 @@ namespace car_rent.Server.Migrations
 
                     b.HasIndex("User_ID");
 
-                    b.ToTable("History", (string)null);
+                    b.ToTable("History");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
