@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using car_rent_api2.Server.Database;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
