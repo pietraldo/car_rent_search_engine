@@ -25,6 +25,30 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_
 builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+var configuration = builder.Configuration;
+
+var sessionCookieLifetime = builder.Configuration.GetValue("SessionCookieLifetimeMinutes", 60);
+
+// Authentication and Authorization
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    })
+    .AddCookie(setup => setup.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime))
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = Environment.GetEnvironmentVariable("AUTHENTICATION_GOOGLE_ID") ?? throw new InvalidOperationException("Missing Google API client ID");
+        googleOptions.ClientSecret = Environment.GetEnvironmentVariable("AUTHENTICATION_GOOGLE_SECRET") ?? throw new InvalidOperationException("Missing Google API secret");
+        googleOptions.CallbackPath = "/api/Identity/signin-google";
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddEntityFrameworkStores<SearchEngineDbContext>()
+    .AddDefaultTokenProviders().AddApiEndpoints();
+
+builder.Services.AddHttpLogging(o => {});
 
 var app = builder.Build();
 
@@ -41,11 +65,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+app.UseHttpLogging();
 
 await app.RunAsync();
 

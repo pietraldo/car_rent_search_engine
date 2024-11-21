@@ -9,6 +9,14 @@ const NavigationBar = () => {
             <div className="desktopMenu">
                 <Link to="/" className="desktopMenuListItem">Home</Link>
                 <Link to="/login" className="desktopMenuListItem">Login</Link>
+                <li>
+                    <form action="/api/Identity/google-login" method="post">
+                        <button type="submit" name="login-with-google" value="login-with-google"
+                                className="navbar-link">Login with
+                            Google
+                        </button>
+                    </form>
+                </li>
             </div>
         </nav>
     );
