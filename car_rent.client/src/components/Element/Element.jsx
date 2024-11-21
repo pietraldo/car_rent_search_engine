@@ -9,12 +9,21 @@ function Element({ car, apiUrl }) {
     
     const handleClick = () => {
         setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
+
+        async function sendEmail() {
+            const response = await fetch(`Car/sendEmail/${car.offerId}`);
+            if (response.ok)
+                alert("Email sent! Please confirm your rent");
+            const link = await response.text();
+            console.log(link);
+        }
+        sendEmail();
     };
 
     return (
         <div className="carContainer">
             <img
-                src={`${apiUrl}/images/${car.picture}`}
+                src={`${car.picture}`}
                 alt={car.model}
                 className="carImage"
             />

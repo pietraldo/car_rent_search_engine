@@ -57,12 +57,12 @@ export default defineConfig({
                 secure: false
             },
         },
-        port: 5173,
+        port: 5172,
         https: isLocal
             ? {
                 key: fs.readFileSync(keyFilePath),
                 cert: fs.readFileSync(certFilePath),
             }
-            : false,  // Disable HTTPS in production
+            : false  // Disable HTTPS in production
     }
 });
