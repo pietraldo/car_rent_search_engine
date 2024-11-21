@@ -22,6 +22,7 @@ function App() {
     const [currentPage, setCurrentPage] = useState(1); 
     const carsPerPage = 5; 
 
+
     // Update selected values
     const handleToggleSelection = (value, selectedValues, setSelectedValues) => {
         if (selectedValues.includes(value)) {
@@ -29,112 +30,100 @@ function App() {
         } else {
             setSelectedValues([...selectedValues, value]);
         }
-    const [isFilterVisible, setIsFilterVisible] = useState({
-        brands: false,
-        models: false,
-        years: false,
-        colors: false
-    });
-
-    const toggleFilterVisibility = (filter) => {
-        setIsFilterVisible(prevState => ({
-            ...prevState,
-            [filter]: !prevState[filter] // Toggle visibility for the selected filter group
-        }));
-    };
-    useEffect(() => {
-        async function fetchCars() {
-            setIsLoading(true);
-            await getCars();
-            setIsLoading(false);
-        }
-        fetchCars();
-    }, []);
-
-    // Fetch car data from the API
-    async function getCars() {
-        try {
-            const response = await fetch(`/Car`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch car data.');
-            }
-            const data = await response.json();
-            setCars(data);
-            setFilteredCars(data);
-        } catch (error) {
-            console.error('Error fetching cars:', error);
-            setCars([]);
-            setFilteredCars([]);
-        }
     }
+        useEffect(() => {
+            async function fetchCars() {
+                setIsLoading(true);
+                await getCars();
+                setIsLoading(false);
+            }
+            fetchCars();
+        }, []);
 
-    // Extract unique options for filters
-    const uniqueBrands = cars.length > 0 ? [...new Set(cars.map(car => car.brand))] : [];
-    const uniqueModels = cars.length > 0 ? [...new Set(cars.map(car => car.model))] : [];
-    const uniqueYears = cars.length > 0 ? [...new Set(cars.map(car => car.year))] : [];
-    const uniqueColors = cars.length > 0 ? [...new Set(cars.map(car => car.color))] : [];
-
-    // Filter cars based on selected options
-    useEffect(() => {
-        let filtered = cars;
-
-        if (selectedBrands.length > 0) {
-            filtered = filtered.filter(car => selectedBrands.includes(car.brand));
+        // Fetch car data from the API
+        async function getCars() {
+            try {
+                const response = await fetch(`/Car`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch car data.');
+                }
+                const data = await response.json();
+                setCars(data);
+                setFilteredCars(data);
+            } catch (error) {
+                console.error('Error fetching cars:', error);
+                setCars([]);
+                setFilteredCars([]);
+            }
         }
 
-        if (selectedModels.length > 0) {
-            filtered = filtered.filter(car => selectedModels.includes(car.model));
-        }
+        // Extract unique options for filters
+        const uniqueBrands = cars.length > 0 ? [...new Set(cars.map(car => car.brand))] : [];
+        const uniqueModels = cars.length > 0 ? [...new Set(cars.map(car => car.model))] : [];
+        const uniqueYears = cars.length > 0 ? [...new Set(cars.map(car => car.year))] : [];
+        const uniqueColors = cars.length > 0 ? [...new Set(cars.map(car => car.color))] : [];
 
-        if (selectedYears.length > 0) {
-            filtered = filtered.filter(car => selectedYears.includes(car.year));
-        }
+        // Filter cars based on selected options
+        useEffect(() => {
+            let filtered = cars;
 
-        if (selectedColors.length > 0) {
-            filtered = filtered.filter(car => selectedColors.includes(car.color));
-        }
+            if (selectedBrands.length > 0) {
+                filtered = filtered.filter(car => selectedBrands.includes(car.brand));
+            }
 
-        setFilteredCars(filtered);
-        setCurrentPage(1);
-    }, [selectedBrands, selectedModels, selectedYears, selectedColors, cars]);
+            if (selectedModels.length > 0) {
+                filtered = filtered.filter(car => selectedModels.includes(car.model));
+            }
 
-    const totalPages = Math.ceil(filteredCars.length / carsPerPage);
-    const startIndex = (currentPage - 1) * carsPerPage;
-    const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+            if (selectedYears.length > 0) {
+                filtered = filtered.filter(car => selectedYears.includes(car.year));
+            }
 
-    const contents = filteredCars.length === 0
-        ? <p><em>No cars available. Try adjusting the filters.</em></p>
-        : (
-            <div>
-                {currentCars.map((car) => (
-                    <Element key={car.id} car={car} apiUrl={apiUrl} />
-                ))}
-                {/* Pagination Controls */}
-                <div className="pagination">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => handlePageChange(i + 1)}
-                            className={currentPage === i + 1 ? "active" : ""}
-                        >
-                            {i + 1}
-                        </button>
+            if (selectedColors.length > 0) {
+                filtered = filtered.filter(car => selectedColors.includes(car.color));
+            }
+
+            setFilteredCars(filtered);
+            setCurrentPage(1);
+        }, [selectedBrands, selectedModels, selectedYears, selectedColors, cars]);
+
+        const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+        const startIndex = (currentPage - 1) * carsPerPage;
+        const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
+        const handlePageChange = (page) => {
+            setCurrentPage(page);
+        };
+
+        const contents = filteredCars.length === 0
+            ? <p><em>No cars available. Try adjusting the filters.</em></p>
+            : (
+                <div>
+                    {currentCars.map((car) => (
+                        <Element key={car.id} car={car} apiUrl={apiUrl} />
                     ))}
+                    {/* Pagination Controls */}
+                    <div className="pagination">
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => handlePageChange(i + 1)}
+                                className={currentPage === i + 1 ? "active" : ""}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        );
+            );
 
-    return (
-        <div>
-            <NavigationBar />
+        return (
+            <div>
+                <NavigationBar />
 
-            {location.pathname === "/" && (
-                isLoading ? (
-                    <p>Loading filters...</p>
-                ) : (
+                {location.pathname === "/" && (
+                    isLoading ? (
+                        <p>Loading filters...</p>
+                    ) : (
                         <div className="filters">
                             <h2>Filter by:</h2>
 
@@ -181,25 +170,24 @@ function App() {
                                 <BookingDatePicker />
                             </CollapsibleSectionGeneric>
                         </div>
-                )
-            )}
+                    )
+                )}
 
-            <TransitionGroup>
-                <CSSTransition key={location.key} classNames="fade" timeout={300}>
-                    <Routes location={location}>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/" element={<div>{contents}</div>} />
-                    </Routes>
-                </CSSTransition>
-            </TransitionGroup>
-        </div>
-    );
-}
-
-export default function AppWrapper() {
-    return (
-        <Router>
-            <App />
-        </Router>
-    );
-}
+                <TransitionGroup>
+                    <CSSTransition key={location.key} classNames="fade" timeout={300}>
+                        <Routes location={location}>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/" element={<div>{contents}</div>} />
+                        </Routes>
+                    </CSSTransition>
+                </TransitionGroup>
+            </div>
+        );
+    };
+    export default function AppWrapper() {
+        return (
+            <Router>
+                <App />
+            </Router>
+        );
+    };
