@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using car_rent_api2.Server.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ builder.Services.AddCors(options =>
 
 builder.Configuration.AddEnvironmentVariables();
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
-builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
+builder.Services.AddDbContext<SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1");
