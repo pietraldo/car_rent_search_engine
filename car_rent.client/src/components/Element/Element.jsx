@@ -14,7 +14,7 @@ function Element({ car, apiUrl }) {
     return (
         <div className="carContainer">
             <img
-                src={`${apiUrl}/images/${car.picture}`}
+                src={`${car.picture}`}
                 alt={car.model}
                 className="carImage"
             />
