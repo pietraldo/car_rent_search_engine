@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -25,6 +26,8 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_
 builder.Services.AddDbContext<car_rent_api2.Server.Database.SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1");
+builder.Services.AddSingleton<string>(car_rent_company_api1);
 
 var app = builder.Build();
 

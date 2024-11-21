@@ -3,9 +3,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import './BookingDatePicker.css'
 
-const BookingDatePicker = () => {
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+const BookingDatePicker = ({ startDate, endDate, setStartDate, setEndDate }) =>
+{
+    
 
     return (
         <div className="booking-date-picker">
