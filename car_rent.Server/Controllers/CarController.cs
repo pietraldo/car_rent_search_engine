@@ -17,13 +17,15 @@ namespace car_rent.Server.Controllers
 
         private readonly HttpClient _httpClient;
         private readonly string _apiUrl;
+        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
-
+        
         public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
+            _emailService = new MailGunEmailService(); 
         }
 
         [HttpGet(Name = "GetCars")]
@@ -90,20 +92,26 @@ namespace car_rent.Server.Controllers
             return [car1, car2, car3];
         }
 
+        [Authorize]
         [HttpGet("sendEmail/{offerId}")]
         public async Task<ActionResult<string>> SendEmail(string offerId)
         {
             //TODO: if user not logged in return failure
-
+            
             //TODO: Implement sending an email
-
+            
             string url = $"{Request.Scheme}://{Request.Host}";
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
 
-            Console.WriteLine(confirmationLink);
-            return Ok(confirmationLink);
+            var subject = "[Car Rent] Confirm your offer";
+            var message = "Hello! Please confirm your offer by clicking the link: " + confirmationLink;
+            var user = await _userManager.GetUserAsync(User);
+
+            var restResponse = _emailService.SendEmail(user.Email, subject, message);
+
+            return Ok("Confirmation email sent");
         }
 
         [Authorize]
