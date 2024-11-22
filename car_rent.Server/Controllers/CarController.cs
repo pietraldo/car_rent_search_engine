@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Text.Json;
 using car_rent.Server.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using System.Text;
 
 namespace car_rent.Server.Controllers
 {
@@ -12,18 +16,22 @@ namespace car_rent.Server.Controllers
     {
 
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl; 
-                                                                    
-        public CarController(HttpClient httpClient, string car_rent_company_api1)
+        private readonly string _apiUrl;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
+            _userManager = userManager;
         }
 
         [HttpGet(Name = "GetCars")]
         public async Task<ActionResult<IEnumerable<OfferToDisplay>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
         {
-            int clientId = 0;
+            var user = await _userManager.GetUserAsync(User);
+            string clientId = (user == null ? "" : user.Id.ToString());
+
             var requestUrl = $"{_apiUrl}/api/offer?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&brand={search_brand}&model={search_model}&clientId={clientId}";
 
             try
@@ -46,16 +54,16 @@ namespace car_rent.Server.Controllers
                         var brand = car.GetProperty("brand").GetString();
                         var year = car.GetProperty("year").GetInt32();
                         var color = car.GetProperty("details")[0].GetProperty("value").GetString();  // Assume first detail is color
-                        var picture = _apiUrl+"/"+car.GetProperty("photo").GetString();
+                        var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
 
                         // Create a new Car object and add it to the list
-                        Car carObj = new (model, brand, year, color, picture);
+                        Car carObj = new(model, brand, year, color, picture);
 
                         OfferToDisplay offerToDisplay = new OfferToDisplay
                         {
                             Id = Guid.Parse(offer.GetProperty("id").GetString()),
                             Car = carObj,
-                            ClientId = offer.GetProperty("clientId").GetInt32(),
+                            ClientId = offer.GetProperty("clientId").GetString(),
                             Price = offer.GetProperty("price").GetDouble(),
                             StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
                             EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
@@ -98,13 +106,48 @@ namespace car_rent.Server.Controllers
             return Ok(confirmationLink);
         }
 
+        [Authorize]
         [HttpGet("confirmationLink/{offerId}")]
         public async Task<ActionResult> ConfirmationLink(string offerId)
         {
-            // TODO: Get user id
+            // Get the authenticated user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized("User not found");
+            }
+            string clientId = user.Id.ToString();
 
-            var response=await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentcar/{offerId}");
-            return Ok(response);
+            // Check if the user exists in the external API
+            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/checkClient/{clientId}");
+            if (checkClientResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Prepare and send user information to the external API
+                string name = user.UserName ?? "";
+                string surname = user.LastName ?? "";
+                var userInformation = new { Id = clientId, Name = name, Surname = surname };
+                var userInformationJson = JsonSerializer.Serialize(userInformation);
+                var content = new StringContent(userInformationJson, Encoding.UTF8, "application/json");
+
+                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Offer/createClient", content);
+                if (!createClientResponse.IsSuccessStatusCode)
+                {
+                    return StatusCode((int)createClientResponse.StatusCode, "Failed to create client in external API");
+                }
+            }
+            else if (!checkClientResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)checkClientResponse.StatusCode, "Error checking client in external API");
+            }
+
+            // Proceed with the rent car operation
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentcar/{offerId}/{clientId}");
+            if (!rentCarResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
+            }
+
+            return Ok("Car rented successfully");
         }
 
     }
