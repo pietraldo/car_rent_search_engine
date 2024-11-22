@@ -44,11 +44,21 @@ const NavigationBar = () => {
             <div className="desktopMenu">
                 <Link to="/" className="desktopMenuListItem">Home</Link>
                 <Link to="/history" className="desktopMenuListItem">History</Link>
-                {isLoggedIn ? (
-                    <button className="desktopMenuListItem" onClick={logout}>Logout</button>
-                ) : (
-                    <button className="desktopMenuListItem" onClick={login}>Login</button>
-                )}
+                {/*{isLoggedIn ? (*/}
+                {/*    <button className="desktopMenuListItem" onClick={logout}>Logout</button>*/}
+                {/*) : (*/}
+                {/*    <button className="desktopMenuListItem" onClick={login}>Login</button>*/}
+                {/*)}*/}
+                
+                <div>
+                    <form action="/api/Identity/google-login" method="post">
+                        <button type="submit" name="login-with-google" value="login-with-google"
+                                className="navbar-link">Login with
+                            Google
+                        </button>
+                    </form>
+                </div>
+               
             </div>
         </nav>
     );

@@ -6,6 +6,7 @@
     margin-right: 5%;
     padding: 1rem 2rem;
     display: flex;
+    flex-direction: row;
     align-items: center; /* Center the items vertically */
     justify-content: space-between;
     position: fixed; /* Ensure the navbar stays fixed at the top */
@@ -21,6 +22,7 @@
     margin: 1rem;
     cursor: pointer;
     color: black;
+    width: 20%;
 }
 
     .desktopMenuListItem:hover {
@@ -58,4 +60,13 @@
 
 .logo {
     height: 10vh;
+}
+.li {
+    all: unset;
+}
+
+.navbar-link {
+    margin: 1rem;
+    cursor: pointer;
+    color: black;
 }

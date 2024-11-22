@@ -1,5 +1,6 @@
-﻿using car_rent.Server.Database;
+﻿using car_rent.Server.Model;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 namespace car_rent.Server.Controllers
 {
@@ -25,7 +26,7 @@ namespace car_rent.Server.Controllers
 
             var rent = new Rent
             {
-                User_ID = rentRequest.User_ID,
+                User_ID = new GUIDConverter(rentRequest.User_ID).ConvertToGuid(),
                 Rent_date = rentRequest.Rent_date,
                 Return_date = rentRequest.Return_date,
                 Status = "reserved",  
@@ -48,6 +49,25 @@ namespace car_rent.Server.Controllers
             public int User_ID { get; set; }
             public int Company_ID { get; set; }
             public int Offer_ID { get; set; }
+        }
+        public class GUIDConverter
+        {
+            public int myInt {  get; set; }
+            public GUIDConverter(int myInt)
+            {
+                this.myInt = myInt;
+            }
+            public Guid ConvertToGuid()
+            {
+                byte[] byteArray = new byte[16];  // A GUID is 16 bytes long
+
+                // Fill the byte array with the int value
+                byte[] intBytes = BitConverter.GetBytes(myInt);
+                Array.Copy(intBytes, byteArray, intBytes.Length);
+
+                // Generate a GUID by filling the rest of the bytes with random values (or use a default value)
+                return new Guid(byteArray);
+            }
         }
     }
 }

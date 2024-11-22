@@ -1,6 +1,6 @@
 ﻿using car_rent.Server.Model;
 
-namespace car_rent.Server.Database
+namespace car_rent.Server.Model
 {
     public class Offer
     {
