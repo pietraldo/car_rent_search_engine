@@ -1,4 +1,4 @@
-﻿namespace car_rent.Server.Database
+﻿namespace car_rent.Server.Model
 {
     public class Company
     {

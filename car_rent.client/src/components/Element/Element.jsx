@@ -25,41 +25,52 @@ function Element({ car, apiUrl }) {
 
     const handleClick = async () => {
         if (!isLoggedIn) {
-            navigate('/login'); 
+            navigate('/login');
         } else {
-            try {
-                const userId = 1;
-                const rentDate = new Date(); 
-                const returnDate = new Date(rentDate);
-                returnDate.setDate(rentDate.getDate() + 3); 
+            //try {
+            //    const userId = 1;
+            //    const rentDate = new Date();
+            //    const returnDate = new Date(rentDate);
+            //    returnDate.setDate(rentDate.getDate() + 3);
 
-                const response = await fetch('http://localhost:5109/rent/reserve', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: 1,
-                        rent_date: rentDate.toISOString(),
-                        return_date: returnDate.toISOString(),
-                        status: 'reserved', 
-                        company_id: 1,
-                        offer_id: 2, 
-                    }),
-                });
+            //    const response = await fetch('http://localhost:5109/rent/reserve', {
+            //        method: 'POST',
+            //        headers: {
+            //            'Content-Type': 'application/json',
+            //        },
+            //        body: JSON.stringify({
+            //            user_id: 1,
+            //            rent_date: rentDate.toISOString(),
+            //            return_date: returnDate.toISOString(),
+            //            status: 'reserved',
+            //            company_id: 1,
+            //            offer_id: 2,
+            //        }),
+            //    });
 
-                console.log(response);
+            //    console.log(response);
+            //    if (response.ok) {
+            //        const result = await response.text();
+            //        alert(result); // Show success message
+            //        setButtonText("Rented!");
+            //    } else {
+            //        alert('Failed to reserve the car. Please try again.');
+            //    }
+            //} catch (error) {
+            //    console.error('Error reserving car:', error);
+            //    alert('An error occurred. Please try again.');
+            //}
+            async function sendEmail() {
+                const response = await fetch(`Car/sendEmail/${car.offerId}`);
                 if (response.ok) {
-                    const result = await response.text();
-                    alert(result); // Show success message
-                    setButtonText("Rented!");
-                } else {
-                    alert('Failed to reserve the car. Please try again.');
+                    alert("Email sent! Please confirm your rent");
+                    setButtonText("rented!");
+                    isLoggedIn("true");
                 }
-            } catch (error) {
-                console.error('Error reserving car:', error);
-                alert('An error occurred. Please try again.');
+                const link = await response.text();
+                console.log(link);
             }
+            sendEmail();
         }
     };
 
@@ -67,8 +78,9 @@ function Element({ car, apiUrl }) {
     return (
         <div className="carContainer">
             <img
-                src={`${car.Picture}`}
-                alt={car.Model}
+
+                src={`${car.picture}`}
+                alt={car.model}
                 className="carImage"
             />
             <div style={{ flex: 1 }}>

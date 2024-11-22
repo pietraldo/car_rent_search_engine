@@ -1,5 +1,3 @@
-using car_rent.Server.Database;
-
 namespace car_rent.Server.Model
 {
     public class Car(string model, string brand, int year, string color, string picture)
