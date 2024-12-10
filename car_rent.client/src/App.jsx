@@ -1,13 +1,18 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import NavigationBar from './components/NavigationBar/NavigationBar';
-import Element from './components/Element/Element';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import Login from './pages/login/login';
-import BookingDatePicker from './components/BookingDatePicker/BookingDatePicker';
-import Filter from './components/Filter/Filter'
-import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric/CollapsibleSectionGeneric';
+import { useEffect, useState } from 'react'; // React hooks
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'; // React Router
+import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Transition utilities
+
+// Components
+import NavigationBar from './components/NavigationBar';
+import Element from './components/Element';
+import Login from './pages/login';
+import BookingDatePicker from './components/BookingDatePicker';
+import Filter from './components/Filter';
+import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric';
+
+// Styles
+import '../src/Style/App.css';
+
 
 function App()
 {

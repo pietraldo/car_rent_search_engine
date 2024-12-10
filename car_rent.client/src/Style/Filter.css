@@ -1,14 +1,19 @@
 .filters {
     display: flex;
-    flex-direction: row; /* Align filters horizontally */
+    flex-direction: row;
     gap: 1rem;
     background-color: #f9f9f9;
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     max-width: 100%;
-    margin: 2rem auto;
+    margin: 2rem 5px; /* Adds margin around the filters */
+    position: absolute;
+    top: 15%;
+    left: 5%;
 }
+
+
 
     .filters h2 {
         font-size: 0.9rem;

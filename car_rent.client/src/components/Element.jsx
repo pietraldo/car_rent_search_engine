@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
-import './Element.css';
+import '../Style/Element.css';
 
 
 function Element({ car, apiUrl }) {
