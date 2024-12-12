@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import './Filter.css'; // Include styles if needed
+import '../Style/Filter.css'; // Include styles if needed
 
 const Filter = ({ options, selectedValues, onToggle }) => (
     <div className="filter-option-container">
