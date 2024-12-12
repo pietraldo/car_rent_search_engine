@@ -19,13 +19,13 @@ namespace car_rent.Server.Controllers
         private readonly string _apiUrl;
         private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
-        
+
         public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
-            _emailService = new MailGunEmailService(); 
+            _emailService = new MailGunEmailService();
         }
 
         [HttpGet(Name = "GetCars")]
@@ -38,41 +38,46 @@ namespace car_rent.Server.Controllers
 
             try
             {
-                // Make the HTTP GET request
                 var responseContent = await _httpClient.GetStringAsync(requestUrl);
 
-
+               
                 List<OfferToDisplay> offersToDisplay = new List<OfferToDisplay>();
 
-                using (JsonDocument doc = JsonDocument.Parse(responseContent))
+                var jsonArray = JsonSerializer.Deserialize<JsonElement[]>(responseContent);
+
+                foreach (var offer in jsonArray)
                 {
-                    // Assuming the JSON structure is an array of offers
-                    var offersArray = doc.RootElement.EnumerateArray();
+                    var car = offer.GetProperty("car");
+                    var model = car.GetProperty("model").GetString();
+                    var brand = car.GetProperty("brand").GetString();
+                    var year = car.GetProperty("year").GetInt32();
 
-                    foreach (var offer in offersArray)
+                    
+                    string color = car.GetProperty("details").GetArrayLength() > 0
+                        ? car.GetProperty("details")[0].GetProperty("value").GetString()
+                        : "Unknown";
+
+                    var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
+
+
+                    Car carObj = new Car(model, brand, year, color, picture);
+
+                    // Create a new OfferToDisplay object
+                    OfferToDisplay offerToDisplay = new OfferToDisplay
                     {
-                        var car = offer.GetProperty("car");
-                        var model = car.GetProperty("model").GetString();
-                        var brand = car.GetProperty("brand").GetString();
-                        var year = car.GetProperty("year").GetInt32();
-                        var color = car.GetProperty("details")[0].GetProperty("value").GetString();  // Assume first detail is color
-                        var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
+                        Id = Guid.Parse(offer.GetProperty("id").GetString()),
+                        Car = carObj,
+                        ClientId = offer.GetProperty("clientId").GetString(),
+                        Price = offer.GetProperty("price").GetDouble(),
+                        StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
+                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
+                    };
 
-                        // Create a new Car object and add it to the list
-                        Car carObj = new(model, brand, year, color, picture);
-
-                        OfferToDisplay offerToDisplay = new OfferToDisplay
-                        {
-                            Id = Guid.Parse(offer.GetProperty("id").GetString()),
-                            Car = carObj,
-                            ClientId = offer.GetProperty("clientId").GetString(),
-                            Price = offer.GetProperty("price").GetDouble(),
-                            StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
-                            EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
-                        };
-                        offersToDisplay.Add(offerToDisplay);
-                    }
+                    offersToDisplay.Add(offerToDisplay);
                 }
+
+
+
 
                 return Ok(offersToDisplay);
             }
@@ -97,9 +102,9 @@ namespace car_rent.Server.Controllers
         public async Task<ActionResult<string>> SendEmail(string offerId)
         {
             //TODO: if user not logged in return failure
-            
+
             //TODO: Implement sending an email
-            
+
             string url = $"{Request.Scheme}://{Request.Host}";
 
             // Build the confirmation link
