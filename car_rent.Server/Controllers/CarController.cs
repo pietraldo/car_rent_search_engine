@@ -51,16 +51,10 @@ namespace car_rent.Server.Controllers
                     var model = car.GetProperty("model").GetString();
                     var brand = car.GetProperty("brand").GetString();
                     var year = car.GetProperty("year").GetInt32();
-
-                    
-                    string color = car.GetProperty("details").GetArrayLength() > 0
-                        ? car.GetProperty("details")[0].GetProperty("value").GetString()
-                        : "Unknown";
-
                     var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
 
 
-                    Car carObj = new Car(model, brand, year, color, picture);
+                    Car carObj = new Car(model, brand, year, picture);
 
                     // Create a new OfferToDisplay object
                     OfferToDisplay offerToDisplay = new OfferToDisplay
@@ -87,15 +81,7 @@ namespace car_rent.Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [HttpGet("get-cars2", Name = "GetCars2")]
-        public IEnumerable<Car> Get2()
-        {
-            Car car1 = new("Lightning McQueen", "Race Car", 2006, "Red", "mcqueen.jpg");
-            Car car2 = new("Mater", "Tow Truck", 1951, "Rusty Brown", "mater_tow_truck.jpg");
-            Car car3 = new("Doc Hudson", "Hudson Hornet", 1951, "Dark Blue", "doc_hudson.jpg");
-
-            return [car1, car2, car3];
-        }
+        
 
         [Authorize]
         [HttpGet("sendEmail/{offerId}")]
