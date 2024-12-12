@@ -1,12 +1,14 @@
 /* eslint-disable react/prop-types */
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../Style/Element.css';
 
 
-function Element({ car, apiUrl }) {
+function Element({ car, apiUrl}) {
     const [buttonText, setButtonText] = useState("Rent me!");
-    
+    const navigate = useNavigate();
+
     const handleClick = () => {
         setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
 
@@ -19,9 +21,9 @@ function Element({ car, apiUrl }) {
         }
         sendEmail();
     };
-
+    const showDetails = () => { alert("The details will be shown..."); }
     return (
-        <div className="carContainer">
+        <div className="carContainer" onClick={() => navigate(`/car_details/${car.offerId}`)}>
             <img
                 src={`${car.picture}`}
                 alt={car.model}
@@ -36,7 +38,7 @@ function Element({ car, apiUrl }) {
                 </p>
             </div>
             <div className="rentInfo">
-                <p className="carPrice">Price: $XX.XX</p> {/* Replace with actual price */}
+                <p className="carPrice">Price: ${ car.price}</p> {/* Replace with actual price */}
                 <Button className="rentButton" onClick={handleClick}>
                     {buttonText}
                 </Button>

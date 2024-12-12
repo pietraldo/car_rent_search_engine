@@ -9,6 +9,7 @@ import Login from './pages/login';
 import BookingDatePicker from './components/BookingDatePicker';
 import Filter from './components/Filter';
 import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric';
+import CarDetails from './pages/CarDetails'
 
 // Styles
 import '../src/Style/App.css';
@@ -77,10 +78,11 @@ function App()
                 throw new Error('Failed to fetch car data.');
             }
             const data = await response.json();
-            const cars = data.map(offer =>
-            {
-                offer.car.offerId = offer.id;
-                return offer.car;
+            const cars = data.map(offer => {
+                const car = offer.car;
+                car.offerId = offer.id;
+                car.price = offer.price; 
+                return car;
             });
             setCars(cars);
             setFilteredCars(cars);
@@ -140,7 +142,7 @@ function App()
         : (
             <div>
                 {currentCars.map((car) => (
-                    <Element key={car.id} car={car} apiUrl={apiUrl} />
+                    <Element key={car.id} car={car} apiUrl={apiUrl}/>
                 ))}
                 {/* Pagination Controls */}
                 <div className="pagination">
@@ -165,61 +167,66 @@ function App()
                 isLoading ? (
                     <p>Loading filters...</p>
                 ) : (
-                    <div className="filters">
-                        <h2>Filter by:</h2>
+                        <div>
+                            <div className="filters">
+                                <h2>Filter by:</h2>
 
-                        {/* Filters */}
-                        <CollapsibleSectionGeneric title="Brands">
-                            <Filter
-                                options={uniqueBrands}
-                                selectedValues={selectedBrands}
-                                onToggle={(brand) =>
-                                    handleToggleSelection(brand, selectedBrands, setSelectedBrands)
-                                }
-                            />
-                        </CollapsibleSectionGeneric>
-                        <CollapsibleSectionGeneric title="Models">
-                            <Filter
-                                options={uniqueModels}
-                                selectedValues={selectedModels}
-                                onToggle={(model) =>
-                                    handleToggleSelection(model, selectedModels, setSelectedModels)
-                                }
-                            />
-                        </CollapsibleSectionGeneric>
-                        <CollapsibleSectionGeneric title="Years">
-                            <Filter
-                                options={uniqueYears}
-                                selectedValues={selectedYears}
-                                onToggle={(year) =>
-                                    handleToggleSelection(year, selectedYears, setSelectedYears)
-                                }
-                            />
-                        </CollapsibleSectionGeneric>
-                        <CollapsibleSectionGeneric title="Colors">
-                            <Filter
-                                options={uniqueColors}
-                                selectedValues={selectedColors}
-                                onToggle={(color) =>
-                                    handleToggleSelection(color, selectedColors, setSelectedColors)
-                                }
-                            />
-                        </CollapsibleSectionGeneric>
+                                {/* Filters */}
+                                <CollapsibleSectionGeneric title="Brands">
+                                    <Filter
+                                        options={uniqueBrands}
+                                        selectedValues={selectedBrands}
+                                        onToggle={(brand) =>
+                                            handleToggleSelection(brand, selectedBrands, setSelectedBrands)
+                                        }
+                                    />
+                                </CollapsibleSectionGeneric>
+                                <CollapsibleSectionGeneric title="Models">
+                                    <Filter
+                                        options={uniqueModels}
+                                        selectedValues={selectedModels}
+                                        onToggle={(model) =>
+                                            handleToggleSelection(model, selectedModels, setSelectedModels)
+                                        }
+                                    />
+                                </CollapsibleSectionGeneric>
+                                <CollapsibleSectionGeneric title="Years">
+                                    <Filter
+                                        options={uniqueYears}
+                                        selectedValues={selectedYears}
+                                        onToggle={(year) =>
+                                            handleToggleSelection(year, selectedYears, setSelectedYears)
+                                        }
+                                    />
+                                </CollapsibleSectionGeneric>
+                                <CollapsibleSectionGeneric title="Colors">
+                                    <Filter
+                                        options={uniqueColors}
+                                        selectedValues={selectedColors}
+                                        onToggle={(color) =>
+                                            handleToggleSelection(color, selectedColors, setSelectedColors)
+                                        }
+                                    />
+                                </CollapsibleSectionGeneric>
 
-                        {/* Booking Date Picker */}
-                        <CollapsibleSectionGeneric title="Booking Dates">
-                            <BookingDatePicker startDate={startDate} endDate={endDate} setEndDate={setEndDate} setStartDate={setStartDate} />
-                        </CollapsibleSectionGeneric>
-                        <button onClick={searchForCars}>Search</button>
-                    </div>
-                )
-            )}
-
+                                {/* Booking Date Picker */}
+                                <CollapsibleSectionGeneric title="Booking Dates">
+                                    <BookingDatePicker startDate={startDate} endDate={endDate} setEndDate={setEndDate} setStartDate={setStartDate} />
+                                </CollapsibleSectionGeneric>
+                                <button onClick={searchForCars}>Search</button>
+                                </div>
+                            <div className="contents"> {contents} </div>
+                        </div>
+                    )
+                ) 
+            }
+           
+            
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
                     <Routes location={location}>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/" element={<div>{contents}</div>} />
+                        <Route path="/car_details/:offerId" element={<CarDetails />} />
+                        <Route path="/" />
                     </Routes>
                 </CSSTransition>
             </TransitionGroup>
