@@ -1,5 +1,5 @@
-import Button from "react-bootstrap/Button"; // Correct import
-import "./login.css"
+import Button from "react-bootstrap/Button"; 
+import "../Style/login.css"
 
 const login = () => {
     return (

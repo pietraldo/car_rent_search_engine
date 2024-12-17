@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import "./CollapsibleSectionGeneric.css" // Optional CSS for styling
+import "../Style/CollapsibleSectionGeneric.css" 
 
 const CollapsibleSectionGeneric = ({ title, children, className }) => {
     const [isVisible, setIsVisible] = useState(false);

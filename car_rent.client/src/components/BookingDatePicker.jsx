@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import './BookingDatePicker.css'
+import '../Style/BookingDatePicker.css'
 
 const BookingDatePicker = ({ startDate, endDate, setStartDate, setEndDate }) =>
 {

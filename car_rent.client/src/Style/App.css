@@ -184,6 +184,13 @@ label {
     animation: dropdownFade 0.3s ease;
 }
 
+.contents {
+    width: 80%;
+    position: absolute;
+    left: 10%;
+    top:  35%;
+    
+}
 .pagination {
     display: flex;
     justify-content: center;
