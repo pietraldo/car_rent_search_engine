@@ -1,18 +1,23 @@
-import { Link } from 'react-router-dom'; // For route-based navigation
-import './NavigationBar.css';
-import logo from '../../assets/logo2.png';
+import { useNavigate } from 'react-router-dom';
+import '../Style/NavigationBar.css';
+import logo from '../assets/logo2.png';
 
 const NavigationBar = () => {
+    const navigate = useNavigate();
     return (
         <nav className="navBar">
             <img src={logo} alt="logo" className="logo" />
             <div className="desktopMenu">
-                <Link to="/" className="desktopMenuListItem">Home</Link>
-                <Link to="/login" className="desktopMenuListItem">Login</Link>
-                <li>
+                <button
+                    className="desktopMenuButton"
+                    onClick={() => navigate('/')}
+                >
+                    Home
+                </button>
+                <li className="googleButtonHolder">
                     <form action="/api/Identity/google-login" method="post">
                         <button type="submit" name="login-with-google" value="login-with-google"
-                                className="navbar-link">Login with
+                            className="desktopMenuButton">Login with
                             Google
                         </button>
                     </form>
@@ -21,5 +26,4 @@ const NavigationBar = () => {
         </nav>
     );
 };
-
 export default NavigationBar;
