@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Text;
+using System.ComponentModel.Design;
 
 namespace car_rent.Server.Controllers
 {
@@ -19,13 +20,15 @@ namespace car_rent.Server.Controllers
         private readonly string _apiUrl;
         private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SearchEngineDbContext _context;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
             _emailService = new MailGunEmailService();
+            _context = context;
         }
 
         [HttpGet(Name = "GetCars")]
@@ -101,6 +104,25 @@ namespace car_rent.Server.Controllers
             var user = await _userManager.GetUserAsync(User);
 
             var restResponse = _emailService.SendEmail(user.Email, subject, message);
+            
+            //var newRent = new Rent
+            //{
+            //    Rent_date = DateTime.Now,
+            //    Return_date = DateTime.Now.AddDays(7),
+            //    User_ID = user.Id,
+            //    Status = "Confirmed",
+            //    Company_ID = Guid.Parse("1D20F795-F43F-4481-9D6E-D7E3BCC3774A"),
+            //    Offer_ID = Guid.Parse(offerId) };
+
+            //_context.Offers.Add(new Offer()
+            //{
+            //    Offer_ID = Guid.Parse(offerId),
+            //    Price = 0,
+            //    Brand = "xd",
+            //    Rent = newRent,
+            //});
+            //_context.History.Add(newRent);
+            //_context.SaveChanges(); 
 
             return Ok("Confirmation email sent");
         }
@@ -145,6 +167,27 @@ namespace car_rent.Server.Controllers
             {
                 return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
             }
+            
+            var newRent = new Rent
+            {
+                Rent_date = DateTime.Now, // TODO: z url
+                Return_date = DateTime.Now.AddDays(7),
+                User_ID = user.Id,
+                Status = "Confirmed",
+                Company_ID = Guid.Parse(""), // musi byæ jakaœ w bazie
+                Offer_ID = Guid.Parse(offerId)
+            };
+
+            _context.Offers.Add(new Offer()
+            {
+                Offer_ID = Guid.Parse(offerId),
+                Price = 0, // TODO: z Url
+                Brand = "xd",
+                Rent = newRent,
+            });
+            _context.History.Add(newRent);
+
+            _context.SaveChanges();
 
             return Ok("Car rented successfully");
         }

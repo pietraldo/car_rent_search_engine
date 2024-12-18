@@ -5,11 +5,11 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Tran
 // Components
 import NavigationBar from './components/NavigationBar';
 import Element from './components/Element';
-import Login from './pages/login';
 import BookingDatePicker from './components/BookingDatePicker';
 import Filter from './components/Filter';
 import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric';
 import CarDetails from './pages/CarDetails'
+import History from './pages/history'
 
 // Styles
 import '../src/Style/App.css';
@@ -213,7 +213,7 @@ function App()
                                 <CollapsibleSectionGeneric title="Booking Dates">
                                     <BookingDatePicker startDate={startDate} endDate={endDate} setEndDate={setEndDate} setStartDate={setStartDate} />
                                 </CollapsibleSectionGeneric>
-                                <button onClick={searchForCars}>Search</button>
+                                <button className="" onClick={searchForCars}>Search</button>
                                 </div>
                             <div className="contents"> {contents} </div>
                         </div>
@@ -227,6 +227,7 @@ function App()
                     <Routes location={location}>
                         <Route path="/car_details/:offerId" element={<CarDetails />} />
                         <Route path="/" />
+                        <Route path="/history" element={<History/> } />
                     </Routes>
                 </CSSTransition>
             </TransitionGroup>

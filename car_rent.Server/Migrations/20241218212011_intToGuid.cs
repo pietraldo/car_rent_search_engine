@@ -6,37 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace car_rent.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class googleauthentication : Migration
+    public partial class intToGuid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_History_Users_User_ID",
-                table: "History");
-
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropIndex(
-                name: "IX_History_User_ID",
-                table: "History");
-            
-            migrationBuilder.DropColumn(
-                name: "User_ID",
-                table: "History");
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "User_ID",
-                table: "History",
-                type: "uniqueidentifier",
-                nullable: false);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_History_User_ID",
-                table: "History",
-                column: "User_ID");
-            
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -56,13 +30,13 @@ namespace car_rent.Server.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HouseNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DrivingLicenseIssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HouseNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DrivingLicenseIssueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -81,6 +55,31 @@ namespace car_rent.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Companies",
+                columns: table => new
+                {
+                    Company_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Companies", x => x.Company_ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Offers",
+                columns: table => new
+                {
+                    Offer_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Offers", x => x.Offer_ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,6 +188,41 @@ namespace car_rent.Server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "History",
+                columns: table => new
+                {
+                    Rent_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rent_date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Return_date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    User_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Company_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Offer_ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_History", x => x.Rent_ID);
+                    table.ForeignKey(
+                        name: "FK_History_AspNetUsers_User_ID",
+                        column: x => x.User_ID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_History_Companies_Company_ID",
+                        column: x => x.Company_ID,
+                        principalTable: "Companies",
+                        principalColumn: "Company_ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_History_Offers_Offer_ID",
+                        column: x => x.Offer_ID,
+                        principalTable: "Offers",
+                        principalColumn: "Offer_ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -228,22 +262,27 @@ namespace car_rent.Server.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_History_AspNetUsers_User_ID",
+            migrationBuilder.CreateIndex(
+                name: "IX_History_Company_ID",
                 table: "History",
-                column: "User_ID",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                column: "Company_ID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_History_Offer_ID",
+                table: "History",
+                column: "Offer_ID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_History_User_ID",
+                table: "History",
+                column: "User_ID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_History_AspNetUsers_User_ID",
-                table: "History");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -260,58 +299,19 @@ namespace car_rent.Server.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "History");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-            
-            migrationBuilder.DropIndex(
-                name: "IX_History_User_ID",
-                table: "History");
-            
-            migrationBuilder.DropColumn(
-                name: "User_ID",
-                table: "History");
 
-            migrationBuilder.AddColumn<int>(
-                name: "User_ID",
-                table: "History",
-                type: "int",
-                nullable: false);
+            migrationBuilder.DropTable(
+                name: "Companies");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_History_User_ID",
-                table: "History",
-                column: "User_ID");
-            
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    User_ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    House_number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Issue_date_driver_license = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Last_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.User_ID);
-                });
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_History_Users_User_ID",
-                table: "History",
-                column: "User_ID",
-                principalTable: "Users",
-                principalColumn: "User_ID",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.DropTable(
+                name: "Offers");
         }
     }
 }

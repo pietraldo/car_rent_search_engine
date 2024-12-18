@@ -2,9 +2,9 @@
 {
     public class Offer
     {
-        public int Offer_ID { get; set; }
+        public Guid Offer_ID { get; set; }
         public double Price { get; set; }
         public string Brand { get; set; }
-        public Rent Rent { get; set; }
+        public Rent? Rent { get; set; }
     }
 }
