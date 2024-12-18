@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using car_rent_api2.Server.Database;
+using car_rent.Server.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,17 +20,29 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpPost("updatedata")]
-    public IActionResult UpdateData(string firstName, string lastName, string city, string country, string houseNumber, DateTime drivingLicenseIssueDate, DateTime dateOfBirth)
+    public async Task<IActionResult> UpdateData([FromBody] EditUserModel editUserModel)
     {
-        var user = _userManager.GetUserAsync(User);
-        
-        user.Result.FirstName = firstName;
-        user.Result.LastName = lastName;
-        user.Result.City = city;
-        user.Result.Country = country;
-        user.Result.HouseNumber = houseNumber;
-        user.Result.DrivingLicenseIssueDate = drivingLicenseIssueDate;
-        user.Result.DateOfBirth = dateOfBirth;
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        user.FirstName = editUserModel.FirstName;
+        user.LastName = editUserModel.LastName;
+        user.City = editUserModel.City;
+        user.Country = editUserModel.Country;
+        user.HouseNumber = editUserModel.HouseNumber;
+        user.DrivingLicenseIssueDate = editUserModel.DrivingLicenseIssueDate;
+        user.DateOfBirth = editUserModel.DateOfBirth;
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(500, "Error updating user data.");
+        }
 
         return Ok();
     }
