@@ -147,6 +147,7 @@ namespace car_rent.Server.Controllers
             }
 
             return Ok("Car rented successfully");
+
         }
 
     }
