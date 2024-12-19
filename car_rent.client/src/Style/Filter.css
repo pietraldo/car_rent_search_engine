@@ -11,6 +11,7 @@
     position: absolute;
     top: 15%;
     left: 5%;
+    
 }
 
 
@@ -61,7 +62,12 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     gap: 0.5rem;
-    max-width: 300px;
+    width: 12rem;
+    max-width: 10px;
+    gap: 1rem;
+    z-index: 10;
+    position: absolute;
+    margin-right: 2rem;
 }
 
 .filter-element-wrapper {

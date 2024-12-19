@@ -2,13 +2,13 @@
 {
     public class Rent
     {
-        public int Rent_ID { get; set; }
+        public Guid Rent_ID { get; set; }
         public DateTime Rent_date { get; set; }
         public DateTime Return_date { get; set; }
         public Guid User_ID { get; set; }
         public string Status { get; set; }
-        public int Company_ID { get; set; }
-        public int Offer_ID { get; set; }
+        public Guid Company_ID { get; set; }
+        public Guid Offer_ID { get; set; }
         // Navigation properties
         public ApplicationUser User { get; set; }
         public Offer Offer { get; set; }
