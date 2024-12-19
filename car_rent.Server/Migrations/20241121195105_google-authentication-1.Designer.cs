@@ -12,8 +12,8 @@ using car_rent_api2.Server.Database;
 namespace car_rent.Server.Migrations
 {
     [DbContext(typeof(SearchEngineDbContext))]
-    [Migration("20241218212011_intToGuid")]
-    partial class intToGuid
+    [Migration("20241121195105_google-authentication-1")]
+    partial class googleauthentication1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -245,9 +245,11 @@ namespace car_rent.Server.Migrations
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Company", b =>
                 {
-                    b.Property<Guid>("Company_ID")
+                    b.Property<int>("Company_ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Company_ID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -260,9 +262,11 @@ namespace car_rent.Server.Migrations
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
                 {
-                    b.Property<Guid>("Offer_ID")
+                    b.Property<int>("Offer_ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Offer_ID"));
 
                     b.Property<string>("Brand")
                         .IsRequired()
@@ -278,15 +282,17 @@ namespace car_rent.Server.Migrations
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Rent", b =>
                 {
-                    b.Property<Guid>("Rent_ID")
+                    b.Property<int>("Rent_ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("Company_ID")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Rent_ID"));
 
-                    b.Property<Guid>("Offer_ID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("Company_ID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Offer_ID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Rent_date")
                         .HasColumnType("datetime2");
@@ -405,7 +411,8 @@ namespace car_rent.Server.Migrations
 
             modelBuilder.Entity("car_rent_api2.Server.Database.Offer", b =>
                 {
-                    b.Navigation("Rent");
+                    b.Navigation("Rent")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
