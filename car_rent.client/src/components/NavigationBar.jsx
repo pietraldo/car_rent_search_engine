@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import '../Style/NavigationBar.css';
 import logo from '../assets/logo2.png';
@@ -44,6 +46,12 @@ const NavigationBar = () => {
                     title={!userEmail ? "You must be logged in to view history" : ""}
                 >
                     History
+                </button>
+                  <button
+                    className="desktopMenuButton"
+                    onClick={() => navigate('/fillData')}
+                >
+                    Update Data
                 </button>
                 <li className="googleButtonHolder">
                     <form action={userEmail ? "api/Identity/google-logout" : "/api/Identity/google-login"} method="post">

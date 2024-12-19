@@ -190,6 +190,7 @@ namespace car_rent.Server.Controllers
             _context.SaveChanges();
 
             return Ok("Car rented successfully");
+
         }
 
     }
