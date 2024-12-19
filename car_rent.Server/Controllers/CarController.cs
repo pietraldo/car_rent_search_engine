@@ -105,24 +105,25 @@ namespace car_rent.Server.Controllers
 
             var restResponse = _emailService.SendEmail(user.Email, subject, message);
 
-            //var newRent = new Rent
-            //{
-            //    Rent_date = DateTime.Now,
-            //    Return_date = DateTime.Now.AddDays(7),
-            //    User_ID = user.Id,
-            //    Status = "Confirmed",
-            //    Company_ID = Guid.Parse("1D20F795-F43F-4481-9D6E-D7E3BCC3774A"),
-            //    Offer_ID = Guid.Parse(offerId) };
+            var newRent = new Rent
+            {
+                Rent_date = DateTime.Now,
+                Return_date = DateTime.Now.AddDays(7),
+                User_ID = user.Id,
+                Status = "Confirmed",
+                Company_ID = Guid.Parse("616F75EE-32BE-EF11-B408-C8CB9ED8344C"),
+                Offer_ID = Guid.Parse(offerId)
+            };
 
-            //_context.Offers.Add(new Offer()
-            //{
-            //    Offer_ID = Guid.Parse(offerId),
-            //    Price = 0,
-            //    Brand = "xd",
-            //    Rent = newRent,
-            //});
-            //_context.History.Add(newRent);
-            //_context.SaveChanges(); 
+            _context.Offers.Add(new Offer()
+            {
+                Offer_ID = Guid.Parse(offerId),
+                Price = 0,
+                Brand = "xd",
+                Rent = newRent,
+            });
+            _context.History.Add(newRent);
+            _context.SaveChanges();
 
             return Ok("Confirmation email sent");
         }

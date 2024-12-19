@@ -43,6 +43,9 @@ function Element({ car, apiUrl}) {
                 <Button className="rentButton" onClick={handleClick}>
                     {buttonText}
                 </Button>
+                <Button className="detailsButton" onClick={() => navigate(`/cardetails`)}>
+                    Show details
+                </Button>
             </div>
         </div>
     );

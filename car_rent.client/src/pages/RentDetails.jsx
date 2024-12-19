@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import "../Style/history.css";
+import "../Style/rentDetails.css";
 
-const History = () => {
+const RentDetails = () => {
     const navigate = useNavigate();
     const [rentalHistory, setRentalHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -83,46 +83,9 @@ const History = () => {
     // Render rental history table
     return (
         <div>
-            <table className="table table-bordered text-center">
-                <thead className="bg-success text-white">
-                    <tr>
-                        <th>Rent Date</th>
-                        <th>Return Date</th>
-                        <th>Year</th>
-                        <th>Company</th>
-                        <th>Price</th>
-                        <th>Model</th>
-                        <th>Brand</th>
-                        <th>Status</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rentalHistory.map((rental) => (
-                        <tr key={rental.rent_ID}> 
-                            <td>{new Date(rental.rent_date).toLocaleDateString()}</td>
-                            <td>{new Date(rental.return_date).toLocaleDateString()}</td>
-                            <td>{rental.year || "N/A"}</td>
-                            <td>{rental.company?.name || "N/A"}</td>
-                            <td>{rental.price || "N/A"}</td>
-                            <td>{rental.model || "N/A"}</td>
-                            <td>{rental.brand || "N/A"}</td>
-                            <td>
-                                {rental.status !== 'returned' ? (
-                                    <button className="btn btn-return">Return</button>
-                                ) : (
-                                    rental.status
-                                )}
-                            </td>
-                            <td>
-                                <button className="btn btn-details" onClick={() => navigate(`/rent_details`)}>Show details</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <h1>Rent details (to be developed)</h1>
         </div>
     );
 };
 
-export default History;
+export default RentDetails;

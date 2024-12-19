@@ -1,31 +1,48 @@
 import { useEffect, useState } from 'react';
-import React from "react";
-import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import '../Style/NavigationBar.css';
 import logo from '../assets/logo2.png';
 
-
 const NavigationBar = () => {
     const navigate = useNavigate();
+
+    // Helper function to get a cookie value by name
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
-
         if (parts.length === 2) {
-            // Decode the cookie value
             return decodeURIComponent(parts.pop().split(";").shift());
         }
+        return null;
     }
+
+    // Helper function to delete a cookie by name
+    function deleteCookie(name) {
+        document.cookie = `${name}=; max-age=0; path=/`;
+    }
+
+    // Clear cookies on the first page load
+    useEffect(() => {
+        // Check if it's the first time loading the page
+        const isFirstLoad = !localStorage.getItem('hasVisited');
+
+        if (isFirstLoad) {
+            // Clear the cookies on the first page load
+            deleteCookie('UserEmail');
+
+            // Mark that the user has visited the page
+            localStorage.setItem('hasVisited', 'true');
+        }
+    }, []);
 
     const email = getCookie("UserEmail");
     const [userEmail, setUserEmail] = useState(null);
 
+    // Update the userEmail state if cookie exists
     useEffect(() => {
-        // Retrieve the user email cookie when the component mounts
-        const email = getCookie("UserEmail"); // Cookie name: "UserEmail"
+        const email = getCookie("UserEmail");
         if (email) {
-            setUserEmail(email); // Set user email to state
+            setUserEmail(email);
         }
     }, []);
 
@@ -47,7 +64,7 @@ const NavigationBar = () => {
                 >
                     History
                 </button>
-                  <button
+                <button
                     className="desktopMenuButton"
                     onClick={() => navigate('/fillData')}
                 >
@@ -61,9 +78,9 @@ const NavigationBar = () => {
                         </button>
                     </form>
                 </li>
-                
             </div>
         </nav>
     );
 };
+
 export default NavigationBar;

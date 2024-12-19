@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("https://localhost:5172", "https://localhost:5172/history") // Replace with your frontend URL
                   .AllowAnyHeader()
                   .AllowAnyMethod()
-                  ; 
+                  ;
         });
 });
 
@@ -37,10 +37,10 @@ var sessionCookieLifetime = builder.Configuration.GetValue("SessionCookieLifetim
 
 // Authentication and Authorization
 builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    })
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
     .AddCookie(setup => setup.ExpireTimeSpan = TimeSpan.FromMinutes(sessionCookieLifetime))
     .AddGoogle(googleOptions =>
     {
@@ -54,7 +54,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<SearchEngineDbContext>()
     .AddDefaultTokenProviders().AddApiEndpoints();
 
-builder.Services.AddHttpLogging(o => {});
+builder.Services.AddHttpLogging(o => { });
 
 var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1");
 builder.Services.AddSingleton<string>(car_rent_company_api1);
@@ -86,4 +86,3 @@ app.MapFallbackToFile("/index.html");
 app.UseHttpLogging();
 
 await app.RunAsync();
-

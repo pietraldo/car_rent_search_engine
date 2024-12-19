@@ -1,16 +1,30 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import NavigationBar from './components/NavigationBar';
-import Element from './components/Element';
-import BookingDatePicker from './components/BookingDatePicker';
-import Filter from './components/Filter';
-import CollapsibleSectionGeneric from './components/CollapsibleSectionGeneric';
-import CarDetails from './pages/CarDetails'
 import History from './pages/history'
 import MainPage from './pages/MainPage';
 import FillData from "@/pages/FillData.jsx";
+import RentDetails from './pages/RentDetails';
+import CarDetails from './pages/CarDetails';
 
 function App() {
+    const [userMail, setUserMail] = useState(null);
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+
+        if (parts.length === 2) {
+            // Decode the cookie value
+            return decodeURIComponent(parts.pop().split(";").shift());
+        }
+    }
+    useEffect(() => {
+        // Retrieve the user email cookie when the component mounts
+        const email = getCookie("UserEmail"); // Cookie name: "UserEmail"
+        if (email) {
+            setUserMail(email); // Set user email to state
+        }
+    }, []);
     return (
         <Router>
             <div>
@@ -18,7 +32,9 @@ function App() {
                 <Routes>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/fillData" element={<FillData />} />
-                    <Route path="/history" element={<History/> } />  
+                    <Route path="/history" element={<History />} />  
+                    <Route path="/rent_details" element={<RentDetails />} />
+                    <Route path="/cardetails" element={<CarDetails/> } />
                 </Routes>
             </div>
         </Router>

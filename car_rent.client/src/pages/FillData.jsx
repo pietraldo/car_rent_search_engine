@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../Style/filldata.css";
 
 function FillData() {
     const [firstName, setFirstName] = useState("");
@@ -152,7 +153,7 @@ function FillData() {
                     />
                 </div>
                 <div>
-                    <button type="submit">Submit</button>
+                    <button type="submit" className="submitButton">Submit</button>
                 </div>
             </form>
             {error && <p className="error">{error}</p>}
