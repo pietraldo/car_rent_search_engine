@@ -37,12 +37,7 @@ const History = () => {
                 throw new Error("User email is not available.");
             }
 
-            const response = await fetch('https://localhost:7029/Rentals', {
-                method: 'GET',
-                headers: {
-                    'X-User-Email': userEmail, // Pass user email as a header
-                },
-            });
+            const response = await fetch('/api2/Rentals/rents');
 
             if (!response.ok) {
                 throw new Error("Failed to fetch history data");
@@ -58,6 +53,15 @@ const History = () => {
             setLoading(false);
         }
     };
+
+    const returnOffer = (rentId) => async () =>
+    {
+        console.log("returning...");
+        console.log(`/api2/Rentals/return/${rentId}`)
+        const response = await fetch(`/api2/Rentals/return/${rentId}`);
+
+        fetchHistory();
+    }
 
     // Trigger fetch when userEmail is available
     useEffect(() => {
@@ -101,12 +105,11 @@ const History = () => {
                         <tr key={rental.rent_ID}> 
                             <td>{new Date(rental.rent_date).toLocaleDateString()}</td>
                             <td>{new Date(rental.return_date).toLocaleDateString()}</td>
-                            <td>{rental.companyName || "N/A"}</td>
-                            <td>{rental.offerPrice.toString() || "N/A"}</td>
-                            <td>{rental.offerBrand || "N/A"}</td>
+                            <td>{rental.offer.price.toString() || "N/A"}</td>
+                            <td>{rental.offer.car.brand || "N/A"}</td>
                             <td>
                                 {rental.status !== 'returned' ? (
-                                    <button className="btn btn-return">Return</button>
+                                    <button className="btn btn-return" onClick={returnOffer(rental.rentId_in_company) }>Return</button>
                                 ) : (
                                     rental.status
                                 )}

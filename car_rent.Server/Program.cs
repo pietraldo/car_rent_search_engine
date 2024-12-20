@@ -18,13 +18,12 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("https://localhost:5172", "https://localhost:5172/history") // Replace with your frontend URL
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  ;
+            policy.AllowAnyOrigin() // Allow all origins
+                  .AllowAnyHeader() // Allow any header
+                  .AllowAnyMethod(); // Allow any method
         });
 });
 
@@ -66,7 +65,7 @@ var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.UseCors("AllowFrontend"); // Use the defined CORS policy
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

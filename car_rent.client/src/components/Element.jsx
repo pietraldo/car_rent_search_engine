@@ -15,7 +15,7 @@ function Element({ car, apiUrl}) {
 
         async function sendEmail() {
             console.log(car.startDate, car.endDate, car.brand, car.price);
-            const response = await fetch(`'https://localhost:7029/Car/sendEmail/${car.offerId}`);
+            const response = await fetch(`Car/sendEmail/${car.offerId}`);
 
             if (response.ok)
                 alert("Email sent! Please confirm your rent");
