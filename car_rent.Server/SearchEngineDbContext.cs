@@ -18,7 +18,7 @@ namespace car_rent_api2.Server.Database
             modelBuilder.Entity<Rent>()
                 .HasKey(rent => rent.Rent_ID);
             modelBuilder.Entity<Offer>()
-                .HasKey(offer => offer.Offer_ID);
+                .HasKey(offer => offer.Id);
             modelBuilder.Entity<Company>()
                 .HasKey(company => company.Company_ID);
 

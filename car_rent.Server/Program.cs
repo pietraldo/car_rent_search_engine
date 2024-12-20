@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using car_rent_api2.Server.Database;
+using car_rent.Server.Model;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +29,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Configuration.AddEnvironmentVariables();
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA");
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING_WYSZUKIWARKA") ?? throw new InvalidOperationException("Missing connection string");
 builder.Services.AddDbContext<SearchEngineDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -56,8 +58,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 
 builder.Services.AddHttpLogging(o => {});
 
-var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1");
+var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
 builder.Services.AddSingleton<string>(car_rent_company_api1);
+builder.Services.AddSingleton<IEmailService, MailGunEmailService>();
 
 var app = builder.Build();
 
