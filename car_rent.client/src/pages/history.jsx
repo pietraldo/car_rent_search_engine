@@ -87,13 +87,13 @@ const History = () => {
 
     // Render rental history table
     return (
-        <div>
+        <div className="container">
+        <h1 className="text-center">Rental History</h1>
             <table className="table table-bordered text-center">
                 <thead className="bg-success text-white">
                     <tr>
                         <th>Rent Date</th>
                         <th>Return Date</th>
-                        <th>Company</th>
                         <th>Price</th>
                         <th>Brand</th>
                         <th>Status</th>

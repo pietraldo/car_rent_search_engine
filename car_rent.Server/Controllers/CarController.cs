@@ -170,9 +170,9 @@ namespace car_rent.Server.Controllers
 
             await AddRentToDb(rentId, offerId,user);
 
-            
 
-            return Ok("Car rented successfully");
+
+            return Redirect("/successfulRent");
         }
 
         private class CompanyRent
