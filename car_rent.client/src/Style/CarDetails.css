@@ -1,0 +1,108 @@
+/* General styling for the page */
+.car-details-container {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width: 80%;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Car Photo Section on the left */
+.car-photo {
+    flex: 1;
+    max-width: 400px; /* Set a max width for the photo */
+    min-width: 350px; /* Ensure the photo doesn't get too small */
+    margin-right: 20px; /* Space between photo and the content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* Background color in case the image isn't loaded */
+    border-radius: 8px;
+    height: 400px; /* Fixed height to prevent layout shift */
+    overflow: hidden;
+}
+
+/* Car image */
+.car-photo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Make sure the image covers the entire container without stretching */
+}
+
+/* Content Section on the right */
+.car-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column; /* Stack sections vertically */
+    gap: 20px; /* Space between each section */
+    max-width: 900px;
+}
+
+/* Section styles for individual sections like Specifications, Services */
+.section {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    /* Title for each section inside the grid */
+    .section h2.subtitle {
+        color: #555;
+        font-size: 1.4rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+/* List styles for the sections */
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each item inside the list */
+.list-item {
+    padding: 10px;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+/* Location Section styling */
+.location {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+    .location p {
+        margin: 0;
+        padding: 5px;
+        background-color: #f7f7f7;
+        border-radius: 4px;
+    }
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .car-details-container {
+        flex-direction: column; /* Stack photo and content on smaller screens */
+    }
+
+    .car-photo {
+        max-width: 100%;
+        height: auto;
+        margin-right: 0;
+    }
+
+    .car-info {
+        flex: 1;
+        max-width: 100%;
+    }
+}

@@ -34,7 +34,7 @@ function App() {
                     <Route path="/fillData" element={<FillData />} />
                     <Route path="/history" element={<History />} />  
                     <Route path="/rent_details" element={<RentDetails />} />
-                    <Route path="/cardetails" element={<CarDetails/> } />
+                    <Route path="/cardetails/:carId" element={<CarDetails />} />
                 </Routes>
             </div>
         </Router>

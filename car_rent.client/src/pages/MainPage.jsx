@@ -80,6 +80,10 @@ function MainPage()
                 const car = offer.car;
                 car.offerId = offer.id;
                 car.price = offer.price;
+                car.picture = offer.picture;
+                car.startDate = offer.startDate;
+                car.endDate = offer.endDate;
+                car.brand = offer.brand;
                 return car;
             });
             setCars(cars);
