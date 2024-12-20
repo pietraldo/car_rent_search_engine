@@ -16,7 +16,7 @@ public class MailGunClient(string apiKey)
         request.AddParameter("from", "Excited User <mailgun@sandboxf4a120576c474abd8326c33eb705cee8.mailgun.org>");
         request.AddParameter("to", email);
         request.AddParameter("subject", subject);
-        request.AddParameter("text", message);
+        request.AddParameter("html", message);
         request.Method = Method.Post;
         return client.Execute(request);
     }
