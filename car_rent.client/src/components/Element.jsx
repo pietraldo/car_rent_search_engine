@@ -10,6 +10,7 @@ function Element({ car, apiUrl}) {
     const navigate = useNavigate();
 
     const handleClick = () => {
+
         setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
 
         async function sendEmail() {
@@ -21,9 +22,9 @@ function Element({ car, apiUrl}) {
         }
         sendEmail();
     };
-    const showDetails = () => { alert("The details will be shown..."); }
+     
     return (
-        <div className="carContainer" onClick={() => navigate(`/car_details/${car.offerId}`)}>
+        <div className="carContainer">
             <img
                 src={`${car.picture}`}
                 alt={car.model}
@@ -38,7 +39,7 @@ function Element({ car, apiUrl}) {
                 </p>
             </div>
             <div className="rentInfo">
-                <p className="carPrice">Price: ${ car.price}</p> {/* Replace with actual price */}
+                <p className="carPrice">Price: ${ car.price}</p> 
                 <Button className="rentButton" onClick={handleClick}>
                     {buttonText}
                 </Button>

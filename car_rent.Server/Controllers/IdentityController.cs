@@ -28,6 +28,15 @@ public class IdentityController : ControllerBase
         return Challenge(properties, "Google");
     }
 
+    [HttpPost("google-logout")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GoogleLogout()
+    {
+        Response.Cookies.Delete("UserEmail"); 
+        return Redirect("/"); 
+    }
+
+
     [HttpGet("google-login-callback")]
     [AllowAnonymous]
     public async Task<IActionResult> GoogleCallback()
@@ -42,12 +51,20 @@ public class IdentityController : ControllerBase
             info.ProviderKey,
             false);
 
-        if (signInResult.Succeeded)
-            // User successfully signed in
-            return Redirect("/");
-
-        // User doesn't exist in your system, create a new account
         var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+        if (signInResult.Succeeded)
+        {
+            // Store email in a cookie
+            Response.Cookies.Append("UserEmail", email, new CookieOptions
+            {
+                HttpOnly = false, // Allow JavaScript to access
+                Expires = DateTimeOffset.UtcNow.AddHours(1)
+            });
+
+            return Redirect("/");
+        }
+        
         if (string.IsNullOrEmpty(email)) return BadRequest("Error: Email is not provided by the external provider.");
 
         var user = new ApplicationUser { UserName = email, Email = email };
