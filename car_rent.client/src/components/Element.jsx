@@ -14,7 +14,9 @@ function Element({ car, apiUrl}) {
         setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
 
         async function sendEmail() {
-            const response = await fetch(`Car/sendEmail/${car.offerId}`);
+            console.log(car.startDate, car.endDate, car.brand, car.price);
+            const response = await fetch(`'https://localhost:7029/Car/sendEmail/${car.offerId}`);
+
             if (response.ok)
                 alert("Email sent! Please confirm your rent");
             const link = await response.text();
@@ -42,6 +44,12 @@ function Element({ car, apiUrl}) {
                 <p className="carPrice">Price: ${ car.price}</p> 
                 <Button className="rentButton" onClick={handleClick}>
                     {buttonText}
+                </Button>
+                <Button
+                    className="detailsButton"
+                    onClick={() => navigate(`/cardetails/${car.id}?picture=${car.picture}`)}
+                >
+                    Show details
                 </Button>
             </div>
         </div>

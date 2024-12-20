@@ -1,0 +1,94 @@
+/* General styles for the container */
+.containerbox {
+    width: 600px; 
+    margin: 50px auto; /* Center container vertically and horizontally */
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #f9f9f9; /* Light background for the form */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    font-family: 'Roboto', sans-serif; /* Modern, clean font */
+    text-align: center; /* Center-align text */
+}
+
+    /* Form title */
+    .containerbox h3 {
+        margin-bottom: 20px;
+        color: #333; /* Neutral text color */
+        font-size: 1.8em;
+        font-weight: bold;
+    }
+
+/* Form field styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between form elements */
+}
+
+label {
+    font-weight: 600; /* Emphasize labels */
+    color: #555; /* Slightly muted text for labels */
+    text-align: left; /* Align labels to the left */
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd; /* Subtle border for inputs */
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+}
+
+/* Focus effect on inputs */
+input:focus {
+    border-color: #007bff; /* Highlight input with primary color on focus */
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.4); /* Add subtle shadow on focus */
+}
+
+/* Submit button */
+.submitButton {
+    background-color: #007bff; /* Primary button color */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    .submitButton:hover {
+        background-color: #0056b3; /* Darker shade on hover */
+        transform: scale(1.05); /* Slightly increase size on hover */
+    }
+
+    .submitButton:active {
+        transform: scale(1); /* Reset size on click */
+    }
+
+/* Error message styling */
+.error {
+    color: #ff4d4d; /* Red color for errors */
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .containerbox {
+        padding: 20px;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        font-size: 0.9em;
+    }
+
+    .submitButton  {
+        font-size: 1em;
+    }
+}

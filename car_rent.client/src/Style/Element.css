@@ -37,6 +37,10 @@
 
 .rentInfo {
     text-align: right; /* Align text to the right */
+    display: flex; /* Flexbox for button layout */
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 10px; /* Add some space between buttons */
+    align-items: flex-end; /* Align buttons to the right */
 }
 
 .carPrice {
@@ -52,4 +56,10 @@
     border: none;
     cursor: pointer;
     height: 40px; /* Set desired height */
+    width: 160px;
+}
+
+.detailsButton {
+    width: 160px;
+    height: 40px;
 }
