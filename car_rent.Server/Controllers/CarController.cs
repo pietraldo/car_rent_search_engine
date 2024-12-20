@@ -143,7 +143,7 @@ namespace car_rent.Server.Controllers
                 // Prepare and send user information to the external API
                 string name = user.UserName ?? "";
                 string surname = user.LastName ?? "";
-                var userInformation = new { Id = clientId, Name = name, Surname = surname };
+                var userInformation = new { Id = clientId, Name = name, Surname = surname, Email = user.Email };
                 var userInformationJson = JsonSerializer.Serialize(userInformation);
                 var content = new StringContent(userInformationJson, Encoding.UTF8, "application/json");
 
