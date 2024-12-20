@@ -37,15 +37,7 @@ const BookingDatePicker = ({ startDate, endDate, setStartDate, setEndDate }) =>
                         className="custom-date-picker"
                     />
                 </div>
-                <button
-                    className="booking-button"
-                    disabled={!startDate || !endDate}
-                    onClick={() =>
-                        alert(`Booking from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`)
-                    }
-                >
-                    Reserve Now
-                </button>
+                
             </div>
         </div>
     );

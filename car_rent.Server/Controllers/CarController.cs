@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using System.Text;
 using System.ComponentModel.Design;
+using car_rent.Server.Migrations;
+using System.Text.Json.Serialization;
 
 namespace car_rent.Server.Controllers
 {
@@ -118,25 +120,6 @@ namespace car_rent.Server.Controllers
 
             var restResponse = _emailService.SendEmail(user.Email, subject, message);
             
-            var newRent = new Rent
-            {
-                Rent_date = DateTime.Now,
-                Return_date = DateTime.Now.AddDays(7),
-                User_ID = user.Id,
-                Status = "Confirmed",
-                Company_ID = Guid.Parse("616F75EE-32BE-EF11-B408-C8CB9ED8344C"), // musi byæ jakaœ w bazie
-                Offer_ID = Guid.Parse(offerId)
-            };
-
-            _context.Offers.Add(new Offer()
-            {
-                Offer_ID = Guid.Parse(offerId),
-                Price = 0,
-                Brand = "",
-                Rent = newRent,
-            });
-            _context.History.Add(newRent);
-            _context.SaveChanges();
 
             return Ok("Confirmation email sent");
         }
@@ -182,40 +165,73 @@ namespace car_rent.Server.Controllers
                 return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
             }
 
+            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
+            var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
+
+            await AddRentToDb(rentId, offerId,user);
+
+            
+
+            return Ok("Car rented successfully");
+        }
+
+        private class CompanyRent
+        {
+            [JsonPropertyName("start")]
+            public DateTime Start { get; set; }
+
+            [JsonPropertyName("end")]
+            public DateTime End { get; set; }
+
+            [JsonPropertyName("carBrand")]
+            public string CarBrand { get; set; }
+
+            [JsonPropertyName("carModel")]
+            public string CarModel { get; set; }
+
+            [JsonPropertyName("carYear")]
+            public int CarYear { get; set; }
+
+            [JsonPropertyName("price")]
+            public float Price { get; set; }
+        }
+
+        private async Task AddRentToDb(int rentId, string offerId, ApplicationUser user)
+        {
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Rent/getrent/{rentId}");
+            if (!rentCarResponse.IsSuccessStatusCode)
+            {
+                return;
+            }
+            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
+            var rent = JsonSerializer.Deserialize<CompanyRent>(rentCarResponseContent);
+
             var newRent = new Rent
             {
-                Rent_date = DateTime.Now, 
-                Return_date = DateTime.Now.AddDays(7),
+                RentId_in_company = rentId,
+                Rent_date =rent.Start,
+                Return_date = rent.End,
                 User_ID = user.Id,
                 Status = "Confirmed",
-<<<<<<< HEAD
-                Company_ID = Guid.Parse("616F75EE-32BE-EF11-B408-C8CB9ED8344C"), // musi byæ jakaœ w bazie
-=======
-                Company_ID = Guid.Parse(""), // musi byï¿½ jakaï¿½ w bazie
->>>>>>> 0e0c5097bf459fab3b26bd9c858175160956f303
+                Company_ID = Guid.Parse("00000000-0000-0000-0000-000000000000"),
                 Offer_ID = Guid.Parse(offerId)
             };
 
-            _context.Offers.Add(new Offer()
+            var newOffer = new Offer()
             {
-<<<<<<< HEAD
-                Offer_ID = Guid.Parse(offerId),
-                Price = 0,
-                Brand = "",
-                Rent = newRent,
-=======
                 Id = Guid.Parse(offerId),
-                Price = 0, // TODO: z Url
-                Car = new Car("Volkswagen", "Golf", 2010, string.Empty),
-                Rent = newRent
->>>>>>> 0e0c5097bf459fab3b26bd9c858175160956f303
-            });
+                Price = rent.Price,
+                Car = new Car(rent.CarBrand, rent.CarModel, rent.CarYear, string.Empty),
+                Rent = newRent,
+                ClientId = user.Id.ToString(),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(7)
+            };
+
+            _context.Offers.Add(newOffer);
             _context.History.Add(newRent);
 
             _context.SaveChanges();
-
-            return Ok("Car rented successfully");
-
         }
 
     }

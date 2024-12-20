@@ -9,13 +9,15 @@ function Element({ car, apiUrl}) {
     const [buttonText, setButtonText] = useState("Rent me!");
     const navigate = useNavigate();
 
+    console.log(car);
+
     const handleClick = () => {
 
         setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
 
         async function sendEmail() {
             console.log(car.startDate, car.endDate, car.brand, car.price);
-            const response = await fetch(`'https://localhost:7029/Car/sendEmail/${car.offerId}`);
+            const response = await fetch(`Car/sendEmail/${car.offerId}`);
 
             if (response.ok)
                 alert("Email sent! Please confirm your rent");
@@ -36,7 +38,6 @@ function Element({ car, apiUrl}) {
                 <h2 className="carTitle">{car.model} </h2>
                 <p className="carDescription">
                     Brand: {car.brand} <br />
-                    Color: {car.color }  <br />
                     Year: {car.year } <br />
                 </p>
             </div>

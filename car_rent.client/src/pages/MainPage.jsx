@@ -75,19 +75,31 @@ function MainPage()
             {
                 throw new Error('Failed to fetch car data.');
             }
-            const data = await response.json();
-            const cars = data.map(offer => {
-                const car = offer.car;
-                car.offerId = offer.id;
-                car.price = offer.price;
-                car.picture = offer.picture;
-                car.startDate = offer.startDate;
-                car.endDate = offer.endDate;
-                car.brand = offer.brand;
-                return car;
-            });
-            setCars(cars);
-            setFilteredCars(cars);
+            const rawResponseText = await response.text();
+            console.log(rawResponseText);
+
+            const data = JSON.parse(rawResponseText);
+            console.log(data[0]);
+
+            
+
+            const aa = data.map(bb =>
+            {
+                var cc = {};
+                cc.model = bb.car.model;
+                cc.year = bb.car.year;
+                cc.brand = bb.car.brand;
+                cc.picture = bb.car.picture;
+                cc.price = bb.price;
+                cc.endDate = bb.endDate;
+                cc.startDate = bb.startDate;
+                cc.offerId = bb.id;
+                return cc;
+            }
+            );
+            
+            setCars(aa);
+            setFilteredCars(aa);
         } catch (error)
         {
             console.error('Error fetching cars:', error);
