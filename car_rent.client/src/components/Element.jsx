@@ -9,7 +9,7 @@ function Element({ car, apiUrl}) {
     const [buttonText, setButtonText] = useState("Rent me!");
     const navigate = useNavigate();
 
-    //console.log(car);
+    console.log(car);
 
     const handleClick = () => {
 
@@ -38,7 +38,6 @@ function Element({ car, apiUrl}) {
                 <h2 className="carTitle">{car.model} </h2>
                 <p className="carDescription">
                     Brand: {car.brand} <br />
-                    Color: {car.color }  <br />
                     Year: {car.year } <br />
                 </p>
             </div>

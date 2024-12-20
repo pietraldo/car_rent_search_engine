@@ -79,7 +79,7 @@ function MainPage()
             console.log(rawResponseText);
 
             const data = JSON.parse(rawResponseText);
-            console.log(data[0].car);
+            console.log(data[0]);
 
             
 
@@ -91,8 +91,8 @@ function MainPage()
                 cc.brand = bb.car.brand;
                 cc.picture = bb.car.picture;
                 cc.price = bb.price;
-                cc.endDate = bb.enddate;
-                cc.startDate = bb.startdate;
+                cc.endDate = bb.endDate;
+                cc.startDate = bb.startDate;
                 cc.offerId = bb.id;
                 return cc;
             }
