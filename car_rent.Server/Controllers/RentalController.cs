@@ -21,35 +21,32 @@ namespace car_rent.Server.Controllers
             _httpClient = httpClient;
         }
         [HttpGet]
-        public IActionResult GetHistory()
+        public IActionResult GetHistory([FromHeader(Name = "X-User-Email")] string userEmail)
         {
-            var userEmailEncoded = Request.Cookies["UserEmail"];
-            if (!string.IsNullOrEmpty(userEmailEncoded))
-            {
-                var userEmailDecoded = Uri.UnescapeDataString(userEmailEncoded);
-                Console.WriteLine(userEmailDecoded); 
-
-                
-                var user_id = _context.Users
-                    .Where(u => u.Email == userEmailDecoded);
-
-                var rentedCars = _context.History
-                    .Where(h => h.User.UserName == userEmailDecoded)
-                    .ToList();
-                Console.WriteLine("Rented Cars Data:");
-                foreach (var car in rentedCars)
+            var rentedCars = _context.History
+                .Where(h => h.User.UserName == userEmail) // Filter by user email
+                .Include(h => h.Company)  // Eagerly load the related Company
+                .Include(h => h.Offer)    // Eagerly load the related Offer
+                .Select(h => new
                 {
-                    Console.WriteLine($"Rent ID: {car.Rent_ID}, Status: {car.Status}, Company: {car.Company?.Name}");
-                }
-               
-                return Ok(rentedCars); 
-               
-            }
-            else
+                    h.Rent_date,
+                    h.Return_date,
+                    h.Rent_ID,
+                    h.Status,
+                    CompanyName = h.Company != null ? h.Company.Name : "No Company", // Safe check for null Company
+                    OfferPrice = h.Offer != null ? h.Offer.Price : 0, // Safe check for null Offer
+                    OfferBrand = h.Offer != null ? h.Offer.Brand : "No Brand" // Safe check for null Offer
+                });
+                
+            Console.WriteLine("Rented Cars Data:");
+            foreach (var car in rentedCars)
             {
-                return NotFound("User email not found in cookies.");
+                Console.WriteLine($"Rent ID: {car.Rent_ID}, Status: {car.Status}, Company: {car.CompanyName}, Offer Price: {car.OfferPrice}, Offer Brand: {car.OfferBrand}");
             }
+
+            return Ok(rentedCars);
         }
+
 
     }
 
