@@ -49,6 +49,7 @@ const History = () => {
             }
 
             const data = await response.json();
+            console.log(data);
             setRentalHistory(data);
         } catch (err) {
             console.error('Error fetching history:', err);
@@ -88,10 +89,8 @@ const History = () => {
                     <tr>
                         <th>Rent Date</th>
                         <th>Return Date</th>
-                        <th>Year</th>
                         <th>Company</th>
                         <th>Price</th>
-                        <th>Model</th>
                         <th>Brand</th>
                         <th>Status</th>
                         <th>Details</th>
@@ -102,11 +101,9 @@ const History = () => {
                         <tr key={rental.rent_ID}> 
                             <td>{new Date(rental.rent_date).toLocaleDateString()}</td>
                             <td>{new Date(rental.return_date).toLocaleDateString()}</td>
-                            <td>{rental.year || "N/A"}</td>
-                            <td>{rental.company?.name || "N/A"}</td>
-                            <td>{rental.price || "N/A"}</td>
-                            <td>{rental.model || "N/A"}</td>
-                            <td>{rental.brand || "N/A"}</td>
+                            <td>{rental.companyName || "N/A"}</td>
+                            <td>{rental.offerPrice.toString() || "N/A"}</td>
+                            <td>{rental.offerBrand || "N/A"}</td>
                             <td>
                                 {rental.status !== 'returned' ? (
                                     <button className="btn btn-return">Return</button>
