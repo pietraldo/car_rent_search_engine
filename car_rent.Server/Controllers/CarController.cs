@@ -22,12 +22,12 @@ namespace car_rent.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, IEmailService emailService, SearchEngineDbContext context)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
-            _emailService = new MailGunEmailService();
+            _emailService = emailService;
             _context = context;
         }
 
@@ -57,7 +57,7 @@ namespace car_rent.Server.Controllers
                     var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
 
 
-                    Car carObj = new Car(model, brand, year, picture);
+                    CarToDisplay carObj = new CarToDisplay(brand, model, year, picture);
 
                     // Create a new OfferToDisplay object
                     OfferToDisplay offerToDisplay = new OfferToDisplay
@@ -98,9 +98,22 @@ namespace car_rent.Server.Controllers
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
+            
+            var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");
+            if (!offerResponse.IsSuccessStatusCode)
+            {
+                return StatusCode(500, "Error getting offer from external API");
+            }
+            
+            var json = await offerResponse.Content.ReadAsStreamAsync();
+            var jsonString = await offerResponse.Content.ReadAsStringAsync();
+            var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
 
             var subject = "[Car Rent] Confirm your offer";
-            var message = "Hello! Please confirm your offer by clicking the link: " + confirmationLink;
+
+            var messageCreator = new HtmlMessageGenerator();
+            var message = messageCreator.CreateMessage(offer, confirmationLink);
+            
             var user = await _userManager.GetUserAsync(User);
 
             var restResponse = _emailService.SendEmail(user.Email, subject, message);
@@ -175,16 +188,27 @@ namespace car_rent.Server.Controllers
                 Return_date = DateTime.Now.AddDays(7),
                 User_ID = user.Id,
                 Status = "Confirmed",
+<<<<<<< HEAD
                 Company_ID = Guid.Parse("616F75EE-32BE-EF11-B408-C8CB9ED8344C"), // musi byæ jakaœ w bazie
+=======
+                Company_ID = Guid.Parse(""), // musi byï¿½ jakaï¿½ w bazie
+>>>>>>> 0e0c5097bf459fab3b26bd9c858175160956f303
                 Offer_ID = Guid.Parse(offerId)
             };
 
             _context.Offers.Add(new Offer()
             {
+<<<<<<< HEAD
                 Offer_ID = Guid.Parse(offerId),
                 Price = 0,
                 Brand = "",
                 Rent = newRent,
+=======
+                Id = Guid.Parse(offerId),
+                Price = 0, // TODO: z Url
+                Car = new Car("Volkswagen", "Golf", 2010, string.Empty),
+                Rent = newRent
+>>>>>>> 0e0c5097bf459fab3b26bd9c858175160956f303
             });
             _context.History.Add(newRent);
 
