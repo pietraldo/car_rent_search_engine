@@ -1,7 +1,6 @@
 .container {
     width: 100%;
     margin: 20px auto;
-    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -17,12 +16,9 @@ text-center mb-4 {
 }
 
 .table {
-    width: 80%;
+    width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    position: absolute;
-    top: 30%;
-    left: 10%;
 }
 
 .table-bordered {

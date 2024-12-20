@@ -6,6 +6,7 @@ import MainPage from './pages/MainPage';
 import FillData from "@/pages/FillData.jsx";
 import RentDetails from './pages/RentDetails';
 import CarDetails from './pages/CarDetails';
+import SuccessfulRent from './pages/SuccessfulRent';
 
 function App() {
     const [userMail, setUserMail] = useState(null);
@@ -35,6 +36,7 @@ function App() {
                     <Route path="/history" element={<History />} />  
                     <Route path="/rent_details" element={<RentDetails />} />
                     <Route path="/cardetails/:carId" element={<CarDetails />} />
+                    <Route path="/successfulRent" element={<SuccessfulRent/>} />
                 </Routes>
             </div>
         </Router>

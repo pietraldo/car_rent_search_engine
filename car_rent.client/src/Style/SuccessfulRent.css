@@ -1,0 +1,33 @@
+﻿.container {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f0fdf4; /* Light green background */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+
+.header {
+    color: #16a34a; /* Darker green color */
+    font-size: 2rem;
+    margin: 1rem 0;
+}
+
+.message {
+    font-size: 1.2rem;
+    color: #065f46; /* Subtle green for the message text */
+    margin-bottom: 1.5rem;
+}
+
+.link {
+    display: inline-block;
+    color: #ffffff;
+    background-color: #16a34a; /* Green button */
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+}
