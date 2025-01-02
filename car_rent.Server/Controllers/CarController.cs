@@ -10,6 +10,7 @@ using System.Text;
 using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
+using car_rent.Server.DTOs;
 
 namespace car_rent.Server.Controllers
 {
@@ -137,7 +138,7 @@ namespace car_rent.Server.Controllers
             string clientId = user.Id.ToString();
 
             // Check if the user exists in the external API
-            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/checkClient/{clientId}");
+            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Client/checkClient/{clientId}");
             if (checkClientResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 // Prepare and send user information to the external API
@@ -147,7 +148,7 @@ namespace car_rent.Server.Controllers
                 var userInformationJson = JsonSerializer.Serialize(userInformation);
                 var content = new StringContent(userInformationJson, Encoding.UTF8, "application/json");
 
-                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Offer/createClient", content);
+                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Client/createClient", content);
                 if (!createClientResponse.IsSuccessStatusCode)
                 {
                     return StatusCode((int)createClientResponse.StatusCode, "Failed to create client in external API");
@@ -212,7 +213,7 @@ namespace car_rent.Server.Controllers
                 Rent_date =rent.Start,
                 Return_date = rent.End,
                 User_ID = user.Id,
-                Status = "Confirmed",
+                Status = RentStatus.Reserved,
                 Company_ID = Guid.Parse("00000000-0000-0000-0000-000000000000"),
                 Offer_ID = Guid.Parse(offerId)
             };

@@ -5,6 +5,7 @@ using car_rent.Server.Model;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,11 @@ builder.Services.AddHttpLogging(o => { });
 var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
 builder.Services.AddSingleton<string>(car_rent_company_api1);
 builder.Services.AddSingleton<IEmailService, MailGunEmailService>();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 

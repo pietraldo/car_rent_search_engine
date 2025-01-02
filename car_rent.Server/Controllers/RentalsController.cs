@@ -63,7 +63,7 @@ namespace car_rent.Server.Controllers
                 .Include(r => r.Offer.Car)
                 .FirstOrDefaultAsync();
 
-            rent.Status = "returned";
+            rent.Status = RentStatus.Returned;
 
             await _context.SaveChangesAsync();
 

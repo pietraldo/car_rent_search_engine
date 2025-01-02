@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace car_rent.Server.Model
+namespace car_rent.Server.DTOs
 {
     public class OfferToDisplay
     {

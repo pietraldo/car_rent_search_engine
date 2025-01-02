@@ -1,3 +1,5 @@
+using car_rent.Server.DTOs;
+
 namespace car_rent.Server.Model;
 
 public class HtmlMessageGenerator : IMessageGenerator
