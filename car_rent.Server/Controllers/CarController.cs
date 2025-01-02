@@ -206,15 +206,16 @@ namespace car_rent.Server.Controllers
             }
             var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
             var rent = JsonSerializer.Deserialize<CompanyRent>(rentCarResponseContent);
+            var company = _context.Companies.FirstOrDefault();
 
             var newRent = new Rent
             {
                 RentId_in_company = rentId,
                 Rent_date =rent.Start,
                 Return_date = rent.End,
-                User_ID = user.Id,
+                User = user,
                 Status = RentStatus.Reserved,
-                Company_ID = Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                Company=company,
                 Offer_ID = Guid.Parse(offerId)
             };
 

@@ -14,9 +14,8 @@ namespace car_rent_api2.Server.Database
         public int RentId_in_company { get; set; }
         public DateTime Rent_date { get; set; }
         public DateTime Return_date { get; set; }
-        public Guid User_ID { get; set; }
         public RentStatus Status { get; set; }
-        public Guid Company_ID { get; set; }
+    
         public Guid Offer_ID { get; set; }
         // Navigation properties
         [JsonIgnore]

@@ -4,6 +4,6 @@
     {
         public Guid Company_ID { get; set; }
         public string Name { get; set; }
-        public Rent Rent { get; set; }
+        public List<Rent> Rents { get; set; }
     }
 }

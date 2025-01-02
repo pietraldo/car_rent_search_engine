@@ -27,8 +27,7 @@ namespace car_rent_api2.Server.Database
             // one-to-many rent-user
             modelBuilder.Entity<Rent>()
                 .HasOne(rent => rent.User)
-                .WithMany(user => user.Rents)
-                .HasForeignKey(rent => rent.User_ID);
+                .WithMany(user => user.Rents);
 
             // one-to-one history-offer
             modelBuilder.Entity<Rent>()
@@ -39,8 +38,7 @@ namespace car_rent_api2.Server.Database
             // one-to-one history-company
             modelBuilder.Entity<Rent>()
                 .HasOne(rent => rent.Company)
-                .WithOne(company => company.Rent)
-                .HasForeignKey<Rent>(rent => rent.Company_ID);
+                .WithMany(company => company.Rents);
 
 
         }
