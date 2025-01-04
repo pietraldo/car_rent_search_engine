@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Style/filldata.css";
 
-function FillData() {
+function UpdateUserData() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [city, setCity] = useState("");
@@ -48,7 +48,7 @@ function FillData() {
             setError("Please fill in all fields.");
         } else {
             setError("");
-            fetch("/api/User/updatedata", {
+            fetch("/api/User/updateUserData", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -153,7 +153,7 @@ function FillData() {
                     />
                 </div>
                 <div>
-                    <button type="submit" className="submitButton">Submit</button>
+                    <button type="submit" className="submitButton">Change Data</button>
                 </div>
             </form>
             {error && <p className="error">{error}</p>}
@@ -161,4 +161,4 @@ function FillData() {
     );
 }
 
-export default FillData;
+export default UpdateUserData;
