@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using car_rent_api2.Server.Database;
 using car_rent.Server.Model;
+using car_rent.Server.Notifications;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
@@ -59,7 +60,7 @@ builder.Services.AddHttpLogging(o => { });
 
 var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
 builder.Services.AddSingleton<string>(car_rent_company_api1);
-builder.Services.AddSingleton<IEmailService, MailGunEmailService>();
+builder.Services.AddSingleton<INotificationService, MailGunService>();
 
 var app = builder.Build();
 

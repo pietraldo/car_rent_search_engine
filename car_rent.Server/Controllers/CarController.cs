@@ -10,6 +10,7 @@ using System.Text;
 using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
+using car_rent.Server.Notifications;
 
 namespace car_rent.Server.Controllers
 {
@@ -20,17 +21,17 @@ namespace car_rent.Server.Controllers
 
         private readonly HttpClient _httpClient;
         private readonly string _apiUrl;
-        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, IEmailService emailService, SearchEngineDbContext context)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context, INotificationService notificationService)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
-            _emailService = emailService;
             _context = context;
+            _notificationService = notificationService;
         }
 
         [HttpGet(Name = "GetCars")]
@@ -111,15 +112,9 @@ namespace car_rent.Server.Controllers
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
 
-            var subject = "[Car Rent] Confirm your offer";
-
-            var messageCreator = new HtmlMessageGenerator();
-            var message = messageCreator.CreateMessage(offer, confirmationLink);
-            
             var user = await _userManager.GetUserAsync(User);
-
-            var restResponse = _emailService.SendEmail(user.Email, subject, message);
             
+            _notificationService.Notify(offer, confirmationLink, user);
 
             return Ok("Confirmation email sent");
         }
