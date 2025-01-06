@@ -10,6 +10,7 @@ using System.Text;
 using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 
 namespace car_rent.Server.Controllers
 {
@@ -87,6 +88,60 @@ namespace car_rent.Server.Controllers
             }
         }
 
+        [HttpGet("{offerId:guid}", Name = "GetCarDetails")]
+        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            string clientId = (user == null ? "" : user.Id.ToString());
+
+            var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
+            try
+            {
+                var responseContent = await _httpClient.GetStringAsync(requestUrl);
+
+                var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
+
+                var car = jsonResponse.GetProperty("car");
+
+                var detailsDescription = jsonResponse.TryGetProperty("carDetails", out var detailsArray) && detailsArray.EnumerateArray().Any()
+                    ? string.Join("; ", detailsArray.EnumerateArray().Select(d => $"{d.GetProperty("description").GetString()}: {d.GetProperty("value").GetString()}"))
+                    : "N/A";
+
+                var servicesDescription = jsonResponse.TryGetProperty("services", out var servicesArray) && servicesArray.EnumerateArray().Any()
+                    ? string.Join(", ", servicesArray.EnumerateArray().Select(s => s.GetProperty("name").GetString()))
+                    : "No services available";
+
+                var servicesPrice = jsonResponse.TryGetProperty("services", out servicesArray) && servicesArray.EnumerateArray().Any()
+                    ? servicesArray.EnumerateArray().Sum(s => s.GetProperty("price").GetDouble())
+                    : 0.0;
+
+                var locationName = jsonResponse.TryGetProperty("location", out var locationProperty) && locationProperty.TryGetProperty("name", out var nameProperty) ? nameProperty.GetString() : "N/A";
+                var locationAddress = jsonResponse.TryGetProperty("location", out var locationProperty2) && locationProperty2.TryGetProperty("address", out var addressProperty) ? addressProperty.GetString() : "N/A";
+                var latitude = jsonResponse.TryGetProperty("location", out var locationProperty3) && locationProperty3.TryGetProperty("latitude", out var latProperty) ? latProperty.GetDouble() : double.NaN; // Using double.NaN for missing values
+                var longitude = jsonResponse.TryGetProperty("location", out var locationProperty4) && locationProperty4.TryGetProperty("longitude", out var longProperty) ? longProperty.GetDouble() : double.NaN; // Using double.NaN for missing values
+
+                var photo = car.TryGetProperty("picture", out var pic);
+                var picture = _apiUrl + "/" + (photo ? pic.ToString() : "");
+
+                var carDetailsToDisplay = new CarDetailsToDisplay(
+                    detailsDescription: detailsDescription,
+                    servicesDescription: servicesDescription,
+                    servicesPrice: servicesPrice,
+                    locationName: locationName,
+                    locationAddress: locationAddress,
+                    picture: picture
+                );
+
+                return Ok(carDetailsToDisplay);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}, {ex}");
+            }
+        }
+
+
+
 
         [Authorize]
         [HttpGet("sendEmail/{offerId}")]
@@ -100,13 +155,13 @@ namespace car_rent.Server.Controllers
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
-            
+
             var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");
             if (!offerResponse.IsSuccessStatusCode)
             {
                 return StatusCode(500, "Error getting offer from external API");
             }
-            
+
             var json = await offerResponse.Content.ReadAsStreamAsync();
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
@@ -115,11 +170,11 @@ namespace car_rent.Server.Controllers
 
             var messageCreator = new HtmlMessageGenerator();
             var message = messageCreator.CreateMessage(offer, confirmationLink);
-            
+
             var user = await _userManager.GetUserAsync(User);
 
             var restResponse = _emailService.SendEmail(user.Email, subject, message);
-            
+
 
             return Ok("Confirmation email sent");
         }
@@ -168,7 +223,7 @@ namespace car_rent.Server.Controllers
             var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
             var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
 
-            await AddRentToDb(rentId, offerId,user);
+            await AddRentToDb(rentId, offerId, user);
 
 
 
@@ -209,7 +264,7 @@ namespace car_rent.Server.Controllers
             var newRent = new Rent
             {
                 RentId_in_company = rentId,
-                Rent_date =rent.Start,
+                Rent_date = rent.Start,
                 Return_date = rent.End,
                 User_ID = user.Id,
                 Status = "Confirmed",

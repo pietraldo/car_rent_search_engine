@@ -47,6 +47,7 @@ function MainPage() {
             const rawResponseText = await response.text();
             const data = JSON.parse(rawResponseText);
 
+            console.log(data);
             const carsData = data.map((item) => ({
                 model: item.car.model,
                 year: item.car.year,
@@ -56,7 +57,9 @@ function MainPage() {
                 endDate: item.endDate,
                 startDate: item.startDate,
                 offerId: item.id,
+
             }));
+           
 
             setCars(carsData);
             setFilteredCars(carsData);
@@ -239,7 +242,7 @@ function MainPage() {
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
                     <Routes location={location}>
-                        <Route path="/car_details/:offerId" element={<CarDetails />} />
+                        <Route path="/cardetails/:offerId" element={<CarDetails />} />
                         <Route path="/" />
                     </Routes>
                 </CSSTransition>

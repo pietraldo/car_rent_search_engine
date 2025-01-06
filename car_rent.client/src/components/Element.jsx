@@ -48,8 +48,7 @@ function Element({ car, apiUrl}) {
                 </Button>
                 <Button
                     className="detailsButton"
-                    onClick={() => navigate(`/cardetails/${car.id}?picture=${car.picture}`)}
-                >
+                    onClick={() => navigate(`/cardetails/${car.offerId}`)}>
                     Show details
                 </Button>
             </div>
