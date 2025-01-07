@@ -15,24 +15,26 @@
 
 /* Car Photo Section on the left */
 .car-photo {
-    flex: 1;
+    flex: none;
     max-width: 400px; /* Set a max width for the photo */
     min-width: 350px; /* Ensure the photo doesn't get too small */
     margin-right: 20px; /* Space between photo and the content */
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0; /* Background color in case the image isn't loaded */
     border-radius: 8px;
     height: 400px; /* Fixed height to prevent layout shift */
     overflow: hidden;
+    flex-direction: column;
 }
 
 /* Car image */
 .car-photo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Make sure the image covers the entire container without stretching */
+    width: 90%;
+    height: 90%;
+    object-fit: contain; /* Make sure the image covers the entire container without stretching */
+    background-color: #f0f0f0; /* Background color in case the image isn't loaded */
+    border-radius: 8px;
 }
 
 /* Content Section on the right */
@@ -106,3 +108,46 @@
         max-width: 100%;
     }
 }
+
+
+.list-item label {
+    display: flex;
+    align-items: center; /* Center vertically */
+    gap: 10px; /* Space between the checkbox and text */
+}
+
+/* Center checkbox */
+.list-item input[type="checkbox"] {
+    margin: 0; /* Remove default margins */
+    transform: scale(1.2); /* Optional: Slightly enlarge checkbox */
+}
+
+.rentButton2 {
+    margin: 10px auto;
+    height: 15%;
+    width: 80%;
+    background-color: #4a90e2; /* Subtle blue background */
+    border-radius: 15px; /* Rounded corners for a modern look */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    border: 2px solid transparent; /* Smooth border */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+    cursor: pointer;
+    display: block;
+    box-sizing: border-box; /* Prevent any layout issues */
+}
+
+    .rentButton2:hover {
+        background-color: #357ab7; /* Slightly darker shade on hover */
+    }
+
+    .rentButton2:focus {
+        outline: none; /* Remove the default focus outline */
+        box-shadow: 0 0 5px rgba(72, 122, 255, 0.5); /* Add subtle glow effect when focused */
+    }
+
+    .rentButton2:active {
+        background-color: #2b6ba3; /* Darker shade when clicked */
+    }

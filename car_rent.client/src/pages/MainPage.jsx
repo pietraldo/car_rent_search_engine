@@ -59,8 +59,8 @@ function MainPage() {
                 offerId: item.id,
 
             }));
-           
 
+            console.log(carsData);
             setCars(carsData);
             setFilteredCars(carsData);
         } catch (error) {

@@ -21,5 +21,6 @@ namespace car_rent.Server.Model
 
         [JsonPropertyName("endDate")]
         public DateTime EndDate { get; set; }
+        
     }
 }
