@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace car_rent.Server.Model;
+namespace car_rent.Server.Notifications;
 
 public interface IEmailService
 {

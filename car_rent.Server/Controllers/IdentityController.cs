@@ -78,6 +78,12 @@ public class IdentityController : ControllerBase
         // Sign in the user
         await _signInManager.SignInAsync(user, false);
 
-        return Redirect("/");
+        Response.Cookies.Append("UserEmail", email, new CookieOptions
+        {
+            HttpOnly = false, // Allow JavaScript to access
+            Expires = DateTimeOffset.UtcNow.AddHours(1)
+        });
+        
+        return Redirect("/FillUserDataAfterLogin");
     }
 }
