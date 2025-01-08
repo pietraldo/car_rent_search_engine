@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import '../Style/CarDetails.css'; // Import the CSS file
+import '../Style/CarDetails.css';
 import LocationMap from '../components/LocationMap';
 import Button from 'react-bootstrap/Button';
 
@@ -8,7 +8,7 @@ import Button from 'react-bootstrap/Button';
 const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }; // Example: January 7, 2025
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 };
 
@@ -23,23 +23,24 @@ const CarDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedServices, setSelectedServices] = useState([]);
-    const [isRented, setIsRented] = useState(false); // Track rental status
+    const [currentPrice, setCurrentPrice] = useState(0); // State for current price
+    const [isRented, setIsRented] = useState(false);
 
-    const handleServiceSelection = (event, serviceId) => {
+    const handleServiceSelection = (event, serviceId, servicePrice) => {
         if (event.target.checked) {
-            // Add service ID to the selected list
             setSelectedServices((prevSelected) => [...prevSelected, serviceId]);
+            setCurrentPrice((prevPrice) => prevPrice + servicePrice);
         } else {
-            // Remove service ID from the selected list
             setSelectedServices((prevSelected) =>
                 prevSelected.filter((id) => id !== serviceId)
             );
+            setCurrentPrice((prevPrice) => prevPrice - servicePrice);
         }
     };
 
     const handleClick = () => {
         if (!isRented) {
-            setIsRented(true); // Set as rented
+            setIsRented(true);
             async function sendEmail() {
                 console.log(carDetails.startDate, carDetails.endDate, carDetails.brand, carDetails.price);
                 const response = await fetch(`Car/sendEmail/${carDetails.offerId}`);
@@ -58,12 +59,13 @@ const CarDetails = () => {
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const response = await fetch(`/Car/${offerId}`);
+                const response = await fetch(`/Car/getdetails/${offerId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch car data');
                 }
                 const carDetailsData = await response.json();
                 setCarDetails(carDetailsData);
+                setCurrentPrice(carDetailsData.price || 0); 
                 console.log(carDetailsData);
                 if (carDetailsData.picture) {
                     setPhoto(carDetailsData.picture);
@@ -87,7 +89,7 @@ const CarDetails = () => {
     return (
         <div className="car-details-container">
             <div className="car-photo">
-                <img src={carDetails.picture} alt="Car" className="car-photo-img" />
+                <img src={carDetails.car.picture} alt="Car" className="car-photo-img" />
                 <Button className="rentButton2" onClick={handleClick}>
                     {buttonText}
                 </Button>
@@ -95,46 +97,41 @@ const CarDetails = () => {
 
             {/* Content Section */}
             <div className="car-info">
+                {/* Current Price Section */}
+                <div className="section">
+                    <h2 className="subtitle">Total Price</h2>
+                    <p><strong>Current Price:</strong> {currentPrice.toFixed(2)}$</p>
+                </div>
+
                 {/* Specifications Section */}
                 <div className="section">
-                    <h2 className="subtitle">Basic info</h2>
+                    <h2 className="subtitle">Basic Info</h2>
                     <ul className="list">
                         <li className="list-item">
-                            <strong>Brand:</strong> {carDetails.brand} <br />
-                            <strong>Model:</strong> {carDetails.model} <br />
-                            <strong>Year:</strong> {carDetails.year} <br />
-                            <strong>Price:</strong> {carDetails.price}$
+                            <span className="textInfo"><strong>Brand:</strong> {carDetails.car.brand} <br /> </span>
+                            <span className="textInfo"><strong>Model:</strong> {carDetails.car.model} <br /> </span>
+                            <span className="textInfo"><strong>Year:</strong> {carDetails.car.year} <br /> </span>
+                            <span className="textInfo"><strong>Price:</strong> {carDetails.price}$ </span>
                         </li>
                     </ul>
-                </div>
-                <div className="section">
-                    <h2 className="subtitle">Specifications</h2>
-                    {carDetails.details && carDetails.details.length > 0 ? (
-                        <ul className="list">
-                            {carDetails.details.map((detail) => (
-                                <li className="list-item" key={detail.id}>
-                                    <strong>{detail.description}</strong> {detail.value ? `: ${detail.value}` : ''}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No car details available.</p>
-                    )}
                 </div>
 
                 {/* Services Section */}
                 <div className="section">
                     <h2 className="subtitle">Available Services</h2>
-                    {carDetails.services && carDetails.services.length > 0 ? (
+                    {carDetails.carServices && carDetails.carServices.length > 0 ? (
                         <ul className="list">
-                            {carDetails.services.map((service) => (
+                            {carDetails.carServices.map((service) => (
                                 <li className="list-item" key={service.id}>
                                     <label>
                                         <input
                                             type="checkbox"
-                                            onChange={(e) => handleServiceSelection(e, service.id)}
+                                            onChange={(e) => handleServiceSelection(e, service.id, service.price)}
                                         />
-                                        <strong>{service.name} </strong> {`(${service.description})`} {service.price}$
+                                        <strong>{service.name}</strong><span className="service-description"> {`(${service.description})`}</span>
+                                        <span className="service-price">
+                                            {service.price}$
+                                        </span>
                                     </label>
                                 </li>
                             ))}
@@ -147,11 +144,11 @@ const CarDetails = () => {
                 {/* Location Section */}
                 <div className="section">
                     <h2 className="subtitle">Location</h2>
-                    {carDetails.locationName ? (
+                    {carDetails.location ? (
                         <div className="location">
-                            <p><strong>Garage Name:</strong> {carDetails.locationName}</p>
-                            <p><strong>Address:</strong> {carDetails.locationAddress}</p>
-                            <LocationMap lat={carDetails.latitude} lon={carDetails.longitude} />
+                            <p><strong>Garage Name:</strong> {carDetails.location.name}</p>
+                            <p><strong>Address:</strong> {carDetails.location.address}</p>
+                            <LocationMap lat={carDetails.location.latitude} lon={carDetails.location.longitude} name={carDetails.location.address} />
                         </div>
                     ) : (
                         <p>No location information available.</p>

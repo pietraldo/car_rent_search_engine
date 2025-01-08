@@ -3,8 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 
-const LocationMap = ({ lat, lon }) => {
+const LocationMap = ({ lat, lon, name }) => {
     const position = [lat, lon]; // Coordinates for the marker
+    const garName = name;
 
     return (
         <div style={{ height: '400px', width: '100%' }}>
@@ -14,7 +15,7 @@ const LocationMap = ({ lat, lon }) => {
                 />
                 <Marker position={position}>
                     <Popup>
-                        <strong>Location:</strong> {lat}, {lon}
+                        <strong>Address:</strong> {garName}
                     </Popup>
                 </Marker>
             </MapContainer>

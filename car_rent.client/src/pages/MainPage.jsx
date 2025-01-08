@@ -21,6 +21,7 @@ function MainPage() {
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedModels, setSelectedModels] = useState([]);
     const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedLocations, setSelectedLocations] = useState([]);
     const [openSection, setOpenSection] = useState(null); // Track the currently open section
     const apiUrl = import.meta.env.VITE_API_URL;
     const location = useLocation();
@@ -57,10 +58,8 @@ function MainPage() {
                 endDate: item.endDate,
                 startDate: item.startDate,
                 offerId: item.id,
-
             }));
 
-            console.log(carsData);
             setCars(carsData);
             setFilteredCars(carsData);
         } catch (error) {
@@ -78,6 +77,7 @@ function MainPage() {
     const uniqueBrands = cars.length > 0 ? [...new Set(cars.map((car) => car.brand))] : [];
     const uniqueModels = cars.length > 0 ? [...new Set(cars.map((car) => car.model))] : [];
     const uniqueYears = cars.length > 0 ? [...new Set(cars.map((car) => car.year))] : [];
+
 
     useEffect(() => {
         let filtered = cars;

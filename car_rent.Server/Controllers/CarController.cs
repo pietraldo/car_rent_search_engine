@@ -89,7 +89,7 @@ namespace car_rent.Server.Controllers
             }
         }
 
-        [HttpGet("{offerId:guid}", Name = "GetCarDetails")]
+        [HttpGet("getdetails/{offerId:guid}")]
         public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -99,134 +99,24 @@ namespace car_rent.Server.Controllers
             try
             {
                 var responseContent = await _httpClient.GetStringAsync(requestUrl);
+                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
 
-                // Deserialize the JSON response
-                var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-
-                // Extract the "car" object
-                var car = jsonResponse.TryGetProperty("car", out var carElement) && carElement.ValueKind == JsonValueKind.Object
-                    ? carElement
-                    : default;
-
-                // Extract car properties safely
-                var brand = car.TryGetProperty("brand", out var brandProp) && brandProp.ValueKind == JsonValueKind.String
-                    ? brandProp.GetString()
-                    : "N/A";
-
-                var model = car.TryGetProperty("model", out var modelProp) && modelProp.ValueKind == JsonValueKind.String
-                    ? modelProp.GetString()
-                    : "N/A";
-
-                var year = car.TryGetProperty("year", out var yearProp) && yearProp.ValueKind == JsonValueKind.Number
-                    ? yearProp.GetInt32()
-                    : (int?)null;
-
-                var picture = car.TryGetProperty("picture", out var pictureProp) && pictureProp.ValueKind == JsonValueKind.String
-                    ? _apiUrl + '/'+ pictureProp.GetString()
-                    : null;
-
-                // Extract "location" object
-                var location = jsonResponse.TryGetProperty("location", out var locationElement) && locationElement.ValueKind == JsonValueKind.Object
-                    ? locationElement
-                    : default;
-
-                var locationName = location.TryGetProperty("name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
-                    ? nameProp.GetString()
-                    : "N/A";
-
-                var locationAddress = location.TryGetProperty("address", out var addressProp) && addressProp.ValueKind == JsonValueKind.String
-                    ? addressProp.GetString()
-                    : "N/A";
-
-                var longitude = location.TryGetProperty("longitude", out var longProp) && longProp.ValueKind == JsonValueKind.Number
-                    ? longProp.GetDouble()
-                    : 0.0;
-
-                var latitude = location.TryGetProperty("latitude", out var latProp) && latProp.ValueKind == JsonValueKind.Number
-                    ? latProp.GetDouble()
-                    : 0.0;
-
-
-                // Extract "carDetails" array
-                var details = jsonResponse.TryGetProperty("carDetails", out var detailsArray) && detailsArray.ValueKind == JsonValueKind.Array
-                    ? detailsArray.EnumerateArray()
-                        .Select(d => new CarDetail
-                        {
-                            Id = d.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number
-                                ? idProp.GetInt32()
-                                : 0,
-                            Description = d.TryGetProperty("description", out var descProp) && descProp.ValueKind == JsonValueKind.String
-                                ? descProp.GetString()
-                                : "N/A",
-                            Value = d.TryGetProperty("value", out var valueProp) && valueProp.ValueKind == JsonValueKind.String
-                                ? valueProp.GetString()
-                                : "N/A"
-                        })
-                        .ToList()
-                    : new List<CarDetail>();
-
-                // Extract "services" array
-                var services = jsonResponse.TryGetProperty("carServices", out var servicesArray) && servicesArray.ValueKind == JsonValueKind.Array
-                    ? servicesArray.EnumerateArray()
-                        .Select(s => new CarService
-                        {
-                            Id = s.TryGetProperty("id", out var idProp) && idProp.ValueKind == JsonValueKind.Number
-                                ? idProp.GetInt32()
-                                : 0,
-                            Name = s.TryGetProperty("name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
-                                ? nameProp.GetString()
-                                : "N/A",
-                            Price = s.TryGetProperty("price", out var priceProp) && priceProp.ValueKind == JsonValueKind.Number
-                                ? priceProp.GetDouble()
-                                : 0,
-                            Description = s.TryGetProperty("description", out var descProp) && descProp.ValueKind == JsonValueKind.String
-                                ? descProp.GetString()
-                                : "N/A"
-                        })
-                        .ToList()
-                    : new List<CarService>();
-
-                // Extract rental period
-                var startDate = jsonResponse.TryGetProperty("startDate", out var startDateProp) && startDateProp.ValueKind == JsonValueKind.String
-                    ? DateTime.Parse(startDateProp.GetString())
-                    : DateTime.MinValue;
-
-                var endDate = jsonResponse.TryGetProperty("endDate", out var endDateProp) && endDateProp.ValueKind == JsonValueKind.String
-                    ? DateTime.Parse(endDateProp.GetString())
-                    : DateTime.MinValue;
-
-                // Extract price
-                var price = jsonResponse.TryGetProperty("price", out var priceProp) && priceProp.ValueKind == JsonValueKind.Number
-                    ? priceProp.GetDouble()
-                    : (double?)null;
-
-                // Construct the CarDetailsToDisplay object
-                var carDetailsToDisplay = new CarDetailsToDisplay(
-                    brand: brand,
-                    model: model,
-                    year: year,
-                    price: price,
-                    details: details,
-                    services: services,
-                    locationName: locationName,
-                    locationAddress: locationAddress,
-                    latitude: latitude,
-                    longitude: longitude,
-                    picture: picture,
-                    startDate: startDate,
-                    endDate: endDate
-                );
-
-                return Ok(carDetailsToDisplay);
+                if (carDetails != null)
+                {
+                    carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
+                    return Ok(carDetails);
+                }
+                
+                return NotFound("Car details not found.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}, {ex}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
 
-            [Authorize]
+        [Authorize]
         [HttpGet("sendEmail/{offerId}")]
         public async Task<ActionResult<string>> SendEmail(string offerId)
         {

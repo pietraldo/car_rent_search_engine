@@ -44,6 +44,7 @@
     flex-direction: column; /* Stack sections vertically */
     gap: 20px; /* Space between each section */
     max-width: 900px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Section styles for individual sections like Specifications, Services */
@@ -151,3 +152,18 @@
     .rentButton2:active {
         background-color: #2b6ba3; /* Darker shade when clicked */
     }
+
+.service-price {
+    margin-left: auto; /* Push the price to the right */
+    text-align: right;
+    font-weight: bold; /* Optional: make the price stand out */
+}
+
+.service-description {
+    font-weight: 400;
+}
+
+.textInfo {
+    text-align: left;
+    margin-left: 0%;
+}
