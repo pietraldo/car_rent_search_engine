@@ -1,7 +1,7 @@
 ﻿using RestSharp;
 using RestSharp.Authenticators;
 
-namespace car_rent.Server.Model;
+namespace car_rent.Server.Notifications;
 
 public class MailGunClient(string apiKey)
 {
@@ -13,7 +13,7 @@ public class MailGunClient(string apiKey)
         var request = new RestRequest();
         request.AddParameter("domain", "sandboxf4a120576c474abd8326c33eb705cee8.mailgun.org", ParameterType.UrlSegment);
         request.Resource = "{domain}/messages";
-        request.AddParameter("from", "Excited User <mailgun@sandboxf4a120576c474abd8326c33eb705cee8.mailgun.org>");
+        request.AddParameter("from", "Car Rent <mailgun@sandboxf4a120576c474abd8326c33eb705cee8.mailgun.org>");
         request.AddParameter("to", email);
         request.AddParameter("subject", subject);
         request.AddParameter("html", message);
