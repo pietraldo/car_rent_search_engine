@@ -1,106 +1,154 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import '../Style/CarDetails.css'; // Import the CSS file
+import { useLocation } from 'react-router-dom';
+import '../Style/CarDetails.css';
+import LocationMap from '../components/LocationMap';
+import Button from 'react-bootstrap/Button';
+
+// Utility function to format dates
+const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+};
 
 const CarDetails = () => {
-    const { carId } = useParams(); // Get carId from URL parameters
-    const location = useLocation(); // Get location to extract query params
+    const location = useLocation();
+    const pathParts = location.pathname.split('/');
+    const offerId = pathParts[2];
     const urlParams = new URLSearchParams(location.search);
-    const picture = urlParams.get('picture'); // Extract picture from query params
-
-    const [carDetails, setCarDetails] = useState([]);
-    const [services, setServices] = useState([]);
-    const [locationData, setLocationData] = useState(null);
-    const [photo, setPhoto] = useState(picture); // Set initial photo from the query param
+    const pictureQuery = urlParams.get('picture');
+    const [carDetails, setCarDetails] = useState({});
+    const [photo, setPhoto] = useState(pictureQuery || '');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedServices, setSelectedServices] = useState([]);
+    const [currentPrice, setCurrentPrice] = useState(0); // State for current price
+    const [isRented, setIsRented] = useState(false);
+
+    const handleServiceSelection = (event, serviceId, servicePrice) => {
+        if (event.target.checked) {
+            setSelectedServices((prevSelected) => [...prevSelected, serviceId]);
+            setCurrentPrice((prevPrice) => prevPrice + servicePrice);
+        } else {
+            setSelectedServices((prevSelected) =>
+                prevSelected.filter((id) => id !== serviceId)
+            );
+            setCurrentPrice((prevPrice) => prevPrice - servicePrice);
+        }
+    };
+
+    const handleClick = () => {
+        if (!isRented) {
+            setIsRented(true);
+            async function sendEmail() {
+                console.log(carDetails.startDate, carDetails.endDate, carDetails.brand, carDetails.price);
+                const response = await fetch(`Car/sendEmail/${carDetails.offerId}`);
+                if (response.ok) {
+                    alert("Email sent! Please confirm your rent.");
+                    const link = await response.text();
+                    console.log(link);
+                }
+            }
+            sendEmail();
+        } else {
+            alert("You have already rented this car.");
+        }
+    };
 
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const detailsResponse = await fetch(`https://localhost:7083/api/Car/cardetails/${carId}`);
-                const servicesResponse = await fetch(`https://localhost:7083/api/Car/carservices/${carId}`);
-                const locationResponse = await fetch(`https://localhost:7083/api/Car/location/${carId}`);
-
-                if (!detailsResponse.ok || !servicesResponse.ok || !locationResponse.ok) {
+                const response = await fetch(`/Car/getdetails/${offerId}`);
+                if (!response.ok) {
                     throw new Error('Failed to fetch car data');
                 }
-
-                const carDetailsData = await detailsResponse.json();
-                const servicesData = await servicesResponse.json();
-                const locationData = await locationResponse.json();
-
+                const carDetailsData = await response.json();
                 setCarDetails(carDetailsData);
-                setServices(servicesData);
-                setLocationData(locationData);
-
+                setCurrentPrice(carDetailsData.price || 0); 
+                console.log(carDetailsData);
+                if (carDetailsData.picture) {
+                    setPhoto(carDetailsData.picture);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchCarData();
-    }, [carId, photo]); // Re-run the effect if carId or photo changes
+    }, [offerId]);
 
     if (loading) return <p>Loading car details...</p>;
     if (error) return <p>Error: {error}</p>;
 
+    const buttonText = isRented
+        ? "Reserved!"
+        : `Rent from ${formatDate(carDetails.startDate)} to ${formatDate(carDetails.endDate)}`;
+
     return (
         <div className="car-details-container">
-            {/* Car Photo Section */}
             <div className="car-photo">
-                {photo ? (
-                    <img src={photo} alt="Car" className="car-photo-img" />
-                ) : (
-                    <p>Loading photo...</p>
-                )}
+                <img src={carDetails.car.picture} alt="Car" className="car-photo-img" />
+                <Button className="rentButton2" onClick={handleClick}>
+                    {buttonText}
+                </Button>
             </div>
 
             {/* Content Section */}
             <div className="car-info">
+                {/* Current Price Section */}
+                <div className="section">
+                    <h2 className="subtitle">Total Price</h2>
+                    <p><strong>Current Price:</strong> {currentPrice.toFixed(2)}$</p>
+                </div>
 
                 {/* Specifications Section */}
                 <div className="section">
-                    <h2 className="subtitle">Specifications</h2>
-                    {carDetails.length > 0 ? (
-                        <ul className="list">
-                            {carDetails.map((detail) => (
-                                <li key={detail.id} className="list-item">
-                                    <strong>{detail.description}:</strong> {detail.value || 'N/A'}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No car details available.</p>
-                    )}
+                    <h2 className="subtitle">Basic Info</h2>
+                    <ul className="list">
+                        <li className="list-item">
+                            <span className="textInfo"><strong>Brand:</strong> {carDetails.car.brand} <br /> </span>
+                            <span className="textInfo"><strong>Model:</strong> {carDetails.car.model} <br /> </span>
+                            <span className="textInfo"><strong>Year:</strong> {carDetails.car.year} <br /> </span>
+                            <span className="textInfo"><strong>Price:</strong> {carDetails.price}$ </span>
+                        </li>
+                    </ul>
                 </div>
 
                 {/* Services Section */}
                 <div className="section">
                     <h2 className="subtitle">Available Services</h2>
-                    {services.length > 0 ? (
+                    {carDetails.carServices && carDetails.carServices.length > 0 ? (
                         <ul className="list">
-                            {services.map((service) => (
-                                <li key={service.id} className="list-item">
-                                    <strong>{service.name || 'Unnamed Service'}:</strong> {service.description || 'No description available'} (Price: ${service.price})
+                            {carDetails.carServices.map((service) => (
+                                <li className="list-item" key={service.id}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            onChange={(e) => handleServiceSelection(e, service.id, service.price)}
+                                        />
+                                        <strong>{service.name}</strong><span className="service-description"> {`(${service.description})`}</span>
+                                        <span className="service-price">
+                                            {service.price}$
+                                        </span>
+                                    </label>
                                 </li>
                             ))}
                         </ul>
                     ) : (
-                        <p>No services available.</p>
+                        <p>No car services available.</p>
                     )}
                 </div>
 
                 {/* Location Section */}
                 <div className="section">
                     <h2 className="subtitle">Location</h2>
-                    {locationData ? (
+                    {carDetails.location ? (
                         <div className="location">
-                            <p><strong>Garage Name:</strong> {locationData.name || 'N/A'}</p>
-                            <p><strong>Address:</strong> {locationData.address}</p>
-                            <p><strong>Coordinates:</strong> {locationData.latitude}, {locationData.longitude}</p>
+                            <p><strong>Garage Name:</strong> {carDetails.location.name}</p>
+                            <p><strong>Address:</strong> {carDetails.location.address}</p>
+                            <LocationMap lat={carDetails.location.latitude} lon={carDetails.location.longitude} name={carDetails.location.address} />
                         </div>
                     ) : (
                         <p>No location information available.</p>
@@ -112,4 +160,3 @@ const CarDetails = () => {
 };
 
 export default CarDetails;
-

@@ -10,7 +10,10 @@ using System.Text;
 using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
+using Microsoft.VisualBasic;
 using car_rent.Server.Notifications;
+
 
 namespace car_rent.Server.Controllers
 {
@@ -88,6 +91,32 @@ namespace car_rent.Server.Controllers
             }
         }
 
+        [HttpGet("getdetails/{offerId:guid}")]
+        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            string clientId = user?.Id.ToString() ?? string.Empty;
+
+            var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
+            try
+            {
+                var responseContent = await _httpClient.GetStringAsync(requestUrl);
+                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
+
+                if (carDetails != null)
+                {
+                    carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
+                    return Ok(carDetails);
+                }
+                
+                return NotFound("Car details not found.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
 
         [Authorize]
         [HttpGet("sendEmail/{offerId}")]
@@ -101,20 +130,22 @@ namespace car_rent.Server.Controllers
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
-            
+
             var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");
             if (!offerResponse.IsSuccessStatusCode)
             {
                 return StatusCode(500, "Error getting offer from external API");
             }
-            
+
             var json = await offerResponse.Content.ReadAsStreamAsync();
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
 
+
             var user = await _userManager.GetUserAsync(User);
             
             _notificationService.Notify(offer, confirmationLink, user);
+
 
             return Ok("Confirmation email sent");
         }
@@ -163,7 +194,7 @@ namespace car_rent.Server.Controllers
             var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
             var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
 
-            await AddRentToDb(rentId, offerId,user);
+            await AddRentToDb(rentId, offerId, user);
 
 
 
@@ -204,7 +235,7 @@ namespace car_rent.Server.Controllers
             var newRent = new Rent
             {
                 RentId_in_company = rentId,
-                Rent_date =rent.Start,
+                Rent_date = rent.Start,
                 Return_date = rent.End,
                 User_ID = user.Id,
                 Status = "Confirmed",

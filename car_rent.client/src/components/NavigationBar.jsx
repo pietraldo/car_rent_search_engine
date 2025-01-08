@@ -74,7 +74,7 @@ const NavigationBar = () => {
                     <form action={userEmail ? "api/Identity/google-logout" : "/api/Identity/google-login"} method="post">
                         <button type="submit" name="login-with-google" value="login-with-google"
                             className="desktopMenuButton">
-                            {userEmail ? `${userEmail}` : "Login with Google"}
+                            {userEmail ? `${userEmail}` : "Login"}
                         </button>
                     </form>
                 </li>
