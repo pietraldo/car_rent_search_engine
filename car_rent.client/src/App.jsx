@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import NavigationBar from './components/NavigationBar';
 import History from './pages/history'
 import MainPage from './pages/MainPage';
-import FillData from "@/pages/FillData.jsx";
+import UpdateUserData from "@/pages/UpdateUserData.jsx";
 import RentDetails from './pages/RentDetails';
 import CarDetails from './pages/CarDetails';
 import SuccessfulRent from './pages/SuccessfulRent';
+import FillUserDataAfterLogin from './pages/FillUserDataAfterLogin';
 
 function App() {
     const [userMail, setUserMail] = useState(null);
@@ -32,11 +33,12 @@ function App() {
                 <NavigationBar />
                 <Routes>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/fillData" element={<FillData />} />
+                    <Route path="/fillData" element={<UpdateUserData />} />
                     <Route path="/history" element={<History />} />  
                     <Route path="/rent_details" element={<RentDetails />} />
                     <Route path="/cardetails/:carId" element={<CarDetails />} />
                     <Route path="/successfulRent" element={<SuccessfulRent/>} />
+                    <Route path="/FillUserDataAfterLogin" element={<FillUserDataAfterLogin/>} />
                 </Routes>
             </div>
         </Router>

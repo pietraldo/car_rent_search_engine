@@ -12,6 +12,8 @@ using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
 using Microsoft.VisualBasic;
+using car_rent.Server.Notifications;
+
 
 namespace car_rent.Server.Controllers
 {
@@ -22,17 +24,17 @@ namespace car_rent.Server.Controllers
 
         private readonly HttpClient _httpClient;
         private readonly string _apiUrl;
-        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, IEmailService emailService, SearchEngineDbContext context)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context, INotificationService notificationService)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
-            _emailService = emailService;
             _context = context;
+            _notificationService = notificationService;
         }
 
         [HttpGet(Name = "GetCars")]
@@ -142,14 +144,10 @@ namespace car_rent.Server.Controllers
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
 
-            var subject = "[Car Rent] Confirm your offer";
-
-            var messageCreator = new HtmlMessageGenerator();
-            var message = messageCreator.CreateMessage(offer, confirmationLink);
 
             var user = await _userManager.GetUserAsync(User);
-
-            var restResponse = _emailService.SendEmail(user.Email, subject, message);
+            
+            _notificationService.Notify(offer, confirmationLink, user);
 
 
             return Ok("Confirmation email sent");
@@ -168,7 +166,7 @@ namespace car_rent.Server.Controllers
             string clientId = user.Id.ToString();
 
             // Check if the user exists in the external API
-            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/checkClient/{clientId}");
+            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Client/checkClient/{clientId}");
             if (checkClientResponse.StatusCode == HttpStatusCode.NotFound)
             {
                 // Prepare and send user information to the external API
@@ -178,7 +176,7 @@ namespace car_rent.Server.Controllers
                 var userInformationJson = JsonSerializer.Serialize(userInformation);
                 var content = new StringContent(userInformationJson, Encoding.UTF8, "application/json");
 
-                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Offer/createClient", content);
+                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Client/createClient", content);
                 if (!createClientResponse.IsSuccessStatusCode)
                 {
                     return StatusCode((int)createClientResponse.StatusCode, "Failed to create client in external API");
@@ -190,7 +188,7 @@ namespace car_rent.Server.Controllers
             }
 
             // Proceed with the rent car operation
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentcar/{offerId}/{clientId}");
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentCar/{offerId}/{clientId}");
             if (!rentCarResponse.IsSuccessStatusCode)
             {
                 return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
