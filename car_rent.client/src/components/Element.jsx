@@ -13,7 +13,7 @@ function Element({ car, apiUrl}) {
 
     const handleClick = () => {
 
-        setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
+        setButtonText((prevText) => (prevText !== "Reserved!" ? "Reserved!" : "Rent me!"));
 
         async function sendEmail() {
             console.log(car.startDate, car.endDate, car.brand, car.price);

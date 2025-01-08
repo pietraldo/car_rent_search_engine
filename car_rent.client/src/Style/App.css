@@ -191,7 +191,7 @@ label {
     width: 90%;
     position: absolute;
     left: 5%;
-    top: 40%;
+    top: 45%;
 }
 .pagination {
     display: flex;
@@ -311,7 +311,17 @@ label {
 }
 
 .searchButton {
+    width: 10rem;
     height: 3rem;
+    padding: 0.5rem 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
 }
 
 
@@ -330,6 +340,6 @@ label {
 /* Responsive Adjustment */
 @media (max-width: 950px) {
     .contents {
-        margin-top: 13rem;
+        margin-top: 14rem;
     }
 }

@@ -64,6 +64,7 @@ namespace car_rent.Server.Controllers
                     CarToDisplay carObj = new CarToDisplay(brand, model, year, picture);
 
                     // Create a new OfferToDisplay object
+
                     OfferToDisplay offerToDisplay = new OfferToDisplay
                     {
                         Id = Guid.Parse(offer.GetProperty("id").GetString()),
@@ -71,8 +72,10 @@ namespace car_rent.Server.Controllers
                         ClientId = offer.GetProperty("clientId").GetString(),
                         Price = offer.GetProperty("price").GetDouble(),
                         StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
-                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
+                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString()),
+                        Location = car.GetProperty("location").Deserialize<Location>()
                     };
+                     
 
                     offersToDisplay.Add(offerToDisplay);
                 }
