@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using car_rent.Server.Model;
 
 namespace car_rent.Server.DTOs
 {
@@ -21,5 +22,8 @@ namespace car_rent.Server.DTOs
 
         [JsonPropertyName("endDate")]
         public DateTime EndDate { get; set; }
+        [JsonPropertyName("location")]
+        public Location Location { get; set; }
+        
     }
 }

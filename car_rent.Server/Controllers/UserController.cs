@@ -19,8 +19,8 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("updatedata")]
-    public async Task<IActionResult> UpdateData([FromBody] EditUserModel editUserModel)
+    [HttpPost("updateUserData")]
+    public async Task<IActionResult> UpdateUserData([FromBody] EditUserModel editUserModel)
     {
         var user = await _userManager.GetUserAsync(User);
 

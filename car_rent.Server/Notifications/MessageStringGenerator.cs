@@ -1,10 +1,11 @@
+using car_rent.Server.Model;
 using car_rent.Server.DTOs;
+namespace car_rent.Server.Notifications;
 
-namespace car_rent.Server.Model;
 
 public class HtmlMessageGenerator : IMessageGenerator
 {
-    public string CreateMessage(OfferToDisplay offer, string confirmationLink)
+    public string GenerateOfferMessage(OfferToDisplay offer, string confirmationLink)
     {
         return $@"<html>
 <body>
@@ -27,5 +28,5 @@ Confirm Order
 
 public interface IMessageGenerator
 {
-    public string CreateMessage(OfferToDisplay offer, string confirmationLink);
+    public string GenerateOfferMessage(OfferToDisplay offer, string confirmationLink);
 }

@@ -11,6 +11,10 @@ using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
 using car_rent.Server.DTOs;
+using System.Text.Json.Nodes;
+using Microsoft.VisualBasic;
+using car_rent.Server.Notifications;
+
 
 namespace car_rent.Server.Controllers
 {
@@ -21,17 +25,17 @@ namespace car_rent.Server.Controllers
 
         private readonly HttpClient _httpClient;
         private readonly string _apiUrl;
-        private readonly IEmailService _emailService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, IEmailService emailService, SearchEngineDbContext context)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context, INotificationService notificationService)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
-            _emailService = emailService;
             _context = context;
+            _notificationService = notificationService;
         }
 
         [HttpGet(Name = "GetCars")]
@@ -63,6 +67,7 @@ namespace car_rent.Server.Controllers
                     CarToDisplay carObj = new CarToDisplay(brand, model, year, picture);
 
                     // Create a new OfferToDisplay object
+
                     OfferToDisplay offerToDisplay = new OfferToDisplay
                     {
                         Id = Guid.Parse(offer.GetProperty("id").GetString()),
@@ -70,8 +75,10 @@ namespace car_rent.Server.Controllers
                         ClientId = offer.GetProperty("clientId").GetString(),
                         Price = offer.GetProperty("price").GetDouble(),
                         StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
-                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString())
+                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString()),
+                        Location = car.GetProperty("location").Deserialize<Location>()
                     };
+                     
 
                     offersToDisplay.Add(offerToDisplay);
                 }
@@ -84,6 +91,32 @@ namespace car_rent.Server.Controllers
             catch (Exception ex)
             {
                 // Handle any errors during the HTTP request
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("getdetails/{offerId:guid}")]
+        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            string clientId = user?.Id.ToString() ?? string.Empty;
+
+            var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
+            try
+            {
+                var responseContent = await _httpClient.GetStringAsync(requestUrl);
+                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
+
+                if (carDetails != null)
+                {
+                    carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
+                    return Ok(carDetails);
+                }
+                
+                return NotFound("Car details not found.");
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -101,26 +134,22 @@ namespace car_rent.Server.Controllers
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
-            
+
             var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");
             if (!offerResponse.IsSuccessStatusCode)
             {
                 return StatusCode(500, "Error getting offer from external API");
             }
-            
+
             var json = await offerResponse.Content.ReadAsStreamAsync();
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
 
-            var subject = "[Car Rent] Confirm your offer";
 
-            var messageCreator = new HtmlMessageGenerator();
-            var message = messageCreator.CreateMessage(offer, confirmationLink);
-            
             var user = await _userManager.GetUserAsync(User);
-
-            var restResponse = _emailService.SendEmail(user.Email, subject, message);
             
+            _notificationService.Notify(offer, confirmationLink, user);
+
 
             return Ok("Confirmation email sent");
         }
@@ -160,7 +189,7 @@ namespace car_rent.Server.Controllers
             }
 
             // Proceed with the rent car operation
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentcar/{offerId}/{clientId}");
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentCar/{offerId}/{clientId}");
             if (!rentCarResponse.IsSuccessStatusCode)
             {
                 return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
@@ -169,7 +198,7 @@ namespace car_rent.Server.Controllers
             var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
             var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
 
-            await AddRentToDb(rentId, offerId,user);
+            await AddRentToDb(rentId, offerId, user);
 
 
 
@@ -211,7 +240,7 @@ namespace car_rent.Server.Controllers
             var newRent = new Rent
             {
                 RentId_in_company = rentId,
-                Rent_date =rent.Start,
+                Rent_date = rent.Start,
                 Return_date = rent.End,
                 User = user,
                 Status = RentStatus.Reserved,

@@ -13,7 +13,7 @@ function Element({ car, apiUrl}) {
 
     const handleClick = () => {
 
-        setButtonText((prevText) => (prevText !== "Rented!" ? "Rented!" : "Rent me!"));
+        setButtonText((prevText) => (prevText !== "Reserved!" ? "Reserved!" : "Rent me!"));
 
         async function sendEmail() {
             console.log(car.startDate, car.endDate, car.brand, car.price);
@@ -30,25 +30,29 @@ function Element({ car, apiUrl}) {
     return (
         <div className="carContainer">
             <img
-                src={`${car.picture}`}
+                src={car.picture || "..//..//dist//default.jpg"}
                 alt={car.model}
                 className="carImage"
+                onError={(e) => {
+                    e.target.onerror = null; // Prevent infinite loop in case the default image also fails
+                    e.target.src = "..//..//dist//default.jpg"; // Set a fallback image
+                }}
             />
             <div style={{ flex: 1 }}>
-                <h2 className="carTitle">{car.model} </h2>
+                <h2 className="carTitle">{car.model}</h2>
                 <p className="carDescription">
                     Brand: {car.brand} <br />
-                    Year: {car.year } <br />
+                    Year: {car.year} <br />
                 </p>
             </div>
             <div className="rentInfo">
-                <p className="carPrice">Price: ${ car.price}</p> 
+                <p className="carPrice">Price: ${car.price}</p>
                 <Button className="rentButton" onClick={handleClick}>
                     {buttonText}
                 </Button>
                 <Button
                     className="detailsButton"
-                    onClick={() => navigate(`/cardetails/${car.id}?picture=${car.picture}`)}
+                    onClick={() => navigate(`/cardetails/${car.offerId}`)}
                 >
                     Show details
                 </Button>

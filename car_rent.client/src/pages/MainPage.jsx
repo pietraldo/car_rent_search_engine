@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'; // React hooks
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'; // React Router
-import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Transition utilities
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import Button from 'react-bootstrap/Button';
 
 // Components
 import Element from '../components/Element';
@@ -8,19 +9,21 @@ import BookingDatePicker from '../components/BookingDatePicker';
 import Filter from '../components/Filter';
 import CollapsibleSectionGeneric from '../components/CollapsibleSectionGeneric';
 import CarDetails from '../pages/CarDetails';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
 
 // Styles
 import '../Style/App.css';
 
-
-function MainPage()
-{
-    const [cars, setCars] = useState([]); // All cars fetched from the backend
-    const [filteredCars, setFilteredCars] = useState([]); // Cars after filtering
-    const [selectedBrands, setSelectedBrands] = useState([]); // Selected brands
-    const [selectedModels, setSelectedModels] = useState([]); // Selected models
-    const [selectedYears, setSelectedYears] = useState([]); // Selected years
-    const [selectedColors, setSelectedColors] = useState([]); // Selected colors
+function MainPage() {
+    const [cars, setCars] = useState([]);
+    const [priceRange, setPriceRange] = useState([0, 10000]); // Default price range (min, max)
+    const [filteredCars, setFilteredCars] = useState([]);
+    const [selectedBrands, setSelectedBrands] = useState([]);
+    const [selectedModels, setSelectedModels] = useState([]);
+    const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedLocations, setSelectedLocations] = useState([]);
+    const [openSection, setOpenSection] = useState(null); // Track the currently open section
     const apiUrl = import.meta.env.VITE_API_URL;
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
@@ -28,143 +31,114 @@ function MainPage()
     const carsPerPage = 5;
 
     const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(() =>
-    {
+    const [endDate, setEndDate] = useState(() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow;
     });
 
-    const searchForCars = () =>
-    {
-        fetchCars();
-    }
-
-    // Update selected values
-    const handleToggleSelection = (value, selectedValues, setSelectedValues) =>
-    {
-        if (selectedValues.includes(value))
-        {
-            setSelectedValues(selectedValues.filter((item) => item !== value));
-        } else
-        {
-            setSelectedValues([...selectedValues, value]);
-        }
-    }
-    useEffect(() =>
-    {
-        fetchCars();
-    }, []);
-
-    const fetchCars = async () =>
-    {
+    const fetchCars = async () => {
         setIsLoading(true);
-        await getCars();
-        setIsLoading(false);
-    }
-
-    // Fetch car data from the API
-    async function getCars()
-    {
-        try
-        {
+        try {
             const formattedStartDate = startDate.toISOString();
             const formattedEndDate = endDate.toISOString();
             const response = await fetch(`/Car?startdate=${formattedStartDate}&enddate=${formattedEndDate}`);
-            if (!response.ok)
-            {
+            if (!response.ok) {
                 throw new Error('Failed to fetch car data.');
             }
             const rawResponseText = await response.text();
-            console.log(rawResponseText);
-
             const data = JSON.parse(rawResponseText);
-            console.log(data[0]);
 
-            
+            console.log(data);
+            const carsData = data.map((item) => ({
+                model: item.car.model,
+                year: item.car.year,
+                brand: item.car.brand,
+                picture: item.car.picture,
+                price: item.price,
+                endDate: item.endDate,
+                startDate: item.startDate,
+                offerId: item.id,
+                location: item.location.name
+            }));
 
-            const aa = data.map(bb =>
-            {
-                var cc = {};
-                cc.model = bb.car.model;
-                cc.year = bb.car.year;
-                cc.brand = bb.car.brand;
-                cc.picture = bb.car.picture;
-                cc.price = bb.price;
-                cc.endDate = bb.endDate;
-                cc.startDate = bb.startDate;
-                cc.offerId = bb.id;
-                return cc;
-            }
-            );
-            
-            setCars(aa);
-            setFilteredCars(aa);
-        } catch (error)
-        {
+            setCars(carsData);
+            setFilteredCars(carsData);
+        } catch (error) {
             console.error('Error fetching cars:', error);
             setCars([]);
             setFilteredCars([]);
         }
-    }
+        setIsLoading(false);
+    };
 
-    // Extract unique options for filters
-    const uniqueBrands = cars.length > 0 ? [...new Set(cars.map(car => car.brand))] : [];
-    const uniqueModels = cars.length > 0 ? [...new Set(cars.map(car => car.model))] : [];
-    const uniqueYears = cars.length > 0 ? [...new Set(cars.map(car => car.year))] : [];
-    const uniqueColors = cars.length > 0 ? [...new Set(cars.map(car => car.color))] : [];
+    useEffect(() => {
+        fetchCars();
+    }, []);
 
-    // Filter cars based on selected options
-    useEffect(() =>
-    {
+    const uniqueBrands = cars.length > 0 ? [...new Set(cars.map((car) => car.brand))] : [];
+    const uniqueModels = cars.length > 0 ? [...new Set(cars.map((car) => car.model))] : [];
+    const uniqueYears = cars.length > 0 ? [...new Set(cars.map((car) => car.year))] : [];
+    const uniqueLocations = cars.length > 0 ? [...new Set(cars.map((car) => car.location))] : [];
+
+    useEffect(() => {
         let filtered = cars;
 
-        if (selectedBrands.length > 0)
-        {
-            filtered = filtered.filter(car => selectedBrands.includes(car.brand));
+        if (selectedBrands.length > 0) {
+            filtered = filtered.filter((car) => selectedBrands.includes(car.brand));
         }
 
-        if (selectedModels.length > 0)
-        {
-            filtered = filtered.filter(car => selectedModels.includes(car.model));
+        if (selectedModels.length > 0) {
+            filtered = filtered.filter((car) => selectedModels.includes(car.model));
         }
 
-        if (selectedYears.length > 0)
-        {
-            filtered = filtered.filter(car => selectedYears.includes(car.year));
+        if (selectedYears.length > 0) {
+            filtered = filtered.filter((car) => selectedYears.includes(car.year));
         }
 
-        if (selectedColors.length > 0)
-        {
-            filtered = filtered.filter(car => selectedColors.includes(car.color));
+        if (selectedLocations.length > 0) {
+            filtered = filtered.filter((car) => selectedLocations.includes(car.location));
         }
+
+        filtered = filtered.filter(
+            (car) => car.price >= priceRange[0] && car.price <= priceRange[1]
+        );
 
         setFilteredCars(filtered);
         setCurrentPage(1);
-    }, [selectedBrands, selectedModels, selectedYears, selectedColors, cars]);
+    }, [selectedBrands, selectedModels, selectedYears, cars, priceRange, selectedLocations]);
 
+    const toggleSection = (section) => {
+        setOpenSection((prev) => (prev === section ? null : section));
+    };
+
+    const handleSliderChange = (event, newValue) => {
+        setPriceRange(newValue);
+    };
+
+    const maxPrice = cars.length > 0 ? Math.max(...cars.map((car) => car.price)) : 10000;
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
     const startIndex = (currentPage - 1) * carsPerPage;
     const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
-    const handlePageChange = (page) =>
-    {
+
+    const handlePageChange = (page) => {
         setCurrentPage(page);
     };
 
-    const contents = filteredCars.length === 0
-        ? <p><em>No cars available. Try adjusting the filters.</em></p>
-        : (
+    const contents =
+        filteredCars.length === 0 ? (
+            <p><em>No cars available. Try adjusting the filters.</em></p>
+        ) : (
             <div>
                 {currentCars.map((car) => (
-                    <Element key={car.id} car={car} apiUrl={apiUrl}/>
+                    <Element key={car.offerId} car={car} apiUrl={apiUrl} />
                 ))}
-                {/* Pagination Controls */}
                 <div className="pagination">
                     {Array.from({ length: totalPages }, (_, i) => (
                         <button
                             key={i}
                             onClick={() => handlePageChange(i + 1)}
-                            className={currentPage === i + 1 ? "active" : ""}
+                            className={currentPage === i + 1 ? 'active' : ''}
                         >
                             {i + 1}
                         </button>
@@ -175,75 +149,130 @@ function MainPage()
 
     return (
         <div>
-            {location.pathname === "/" && (
+            {location.pathname === '/' && (
                 isLoading ? (
                     <p>Loading filters...</p>
                 ) : (
-                    <div>
+                    <div className="filter-wrapper">
                         <div className="filters">
-                            <h2>Filter by:</h2>
-
-                            {/* Filters */}
-                            <CollapsibleSectionGeneric title="Brands">
+                            
+                            <CollapsibleSectionGeneric
+                                title="Brands"
+                                isOpen={openSection === 'Brands'}
+                                toggle={() => toggleSection('Brands')}
+                            >
                                 <Filter
                                     options={uniqueBrands}
                                     selectedValues={selectedBrands}
                                     onToggle={(brand) =>
-                                        handleToggleSelection(brand, selectedBrands, setSelectedBrands)
+                                        setSelectedBrands(
+                                            selectedBrands.includes(brand)
+                                                ? selectedBrands.filter((item) => item !== brand)
+                                                : [...selectedBrands, brand]
+                                        )
                                     }
                                 />
                             </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric title="Models">
+                            <CollapsibleSectionGeneric
+                                title="Models"
+                                isOpen={openSection === 'Models'}
+                                toggle={() => toggleSection('Models')}
+                            >
                                 <Filter
                                     options={uniqueModels}
                                     selectedValues={selectedModels}
                                     onToggle={(model) =>
-                                        handleToggleSelection(model, selectedModels, setSelectedModels)
+                                        setSelectedModels(
+                                            selectedModels.includes(model)
+                                                ? selectedModels.filter((item) => item !== model)
+                                                : [...selectedModels, model]
+                                        )
                                     }
                                 />
                             </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric title="Years">
+                            <CollapsibleSectionGeneric
+                                title="Years"
+                                isOpen={openSection === 'Years'}
+                                toggle={() => toggleSection('Years')}
+                            >
                                 <Filter
                                     options={uniqueYears}
                                     selectedValues={selectedYears}
                                     onToggle={(year) =>
-                                        handleToggleSelection(year, selectedYears, setSelectedYears)
+                                        setSelectedYears(
+                                            selectedYears.includes(year)
+                                                ? selectedYears.filter((item) => item !== year)
+                                                : [...selectedYears, year]
+                                        )
                                     }
                                 />
                             </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric title="Colors">
+                            <CollapsibleSectionGeneric
+                                title="Locations"
+                                isOpen={openSection === 'Locations'}
+                                toggle={() => toggleSection('Locations')}
+                            >
                                 <Filter
-                                    options={uniqueColors}
-                                    selectedValues={selectedColors}
-                                    onToggle={(color) =>
-                                        handleToggleSelection(color, selectedColors, setSelectedColors)
+                                    options={uniqueLocations}
+                                    selectedValues={selectedLocations}
+                                    onToggle={(location) =>
+                                        setSelectedLocations(
+                                            selectedLocations.includes(location)
+                                                ? selectedLocations.filter((item) => item !== location)
+                                                : [...selectedLocations, location]
+                                        )
                                     }
                                 />
                             </CollapsibleSectionGeneric>
-
-                            {/* Booking Date Picker */}
-                            <CollapsibleSectionGeneric title="Booking Dates">
-                                <BookingDatePicker startDate={startDate} endDate={endDate} setEndDate={setEndDate} setStartDate={setStartDate} />
+                            <CollapsibleSectionGeneric
+                                title="Booking Dates"
+                                isOpen={openSection === 'Booking Dates'}
+                                toggle={() => toggleSection('Booking Dates')}
+                            >
+                                <BookingDatePicker
+                                    startDate={startDate}
+                                    endDate={endDate}
+                                    setStartDate={setStartDate}
+                                    setEndDate={setEndDate}
+                                />
                             </CollapsibleSectionGeneric>
-                            <button onClick={searchForCars}>Search</button>
+                            <CollapsibleSectionGeneric
+                                title="Price Range"
+                                isOpen={openSection === 'Price Range'}
+                                toggle={() => toggleSection('Price Range')}
+                            >
+                                    <div className="price-range">
+                                        <Box sx={{ width: 200 }} >
+                                        <Slider
+                                            getAriaLabel={() => 'Price range'}
+                                            value={priceRange}
+                                            onChange={handleSliderChange}
+                                            valueLabelDisplay="auto"
+                                            valueLabelFormat={(value) => `$${value}`} // Add "$" to the value
+                                            min={0}
+                                            max={maxPrice}
+                                            step={1}
+                                        />
+                                    </Box>
+                                   
+                                </div>
+                            </CollapsibleSectionGeneric>
+                            <Button onClick={fetchCars} className="searchButton">Search</Button>
                         </div>
-                        <div className="contents"> {contents} </div>
+                        <div className="contents">{contents}</div>
                     </div>
                 )
-            )
-            }
-
-
+            )}
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
                     <Routes location={location}>
-                        <Route path="/car_details/:offerId" element={<CarDetails />} />
+                        <Route path="/cardetails/:offerId" element={<CarDetails />} />
                         <Route path="/" />
                     </Routes>
                 </CSSTransition>
             </TransitionGroup>
         </div>
     );
-};
+}
 
 export default MainPage;

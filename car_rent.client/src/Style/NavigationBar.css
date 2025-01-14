@@ -9,7 +9,7 @@
     justify-content: space-between;
     position: fixed;
     top: 0;
-    z-index: 3;
+    z-index: 12;
     border-radius: 8px;
     left: 5%;
 }
@@ -66,6 +66,7 @@ body {
 .desktopMenu {
     display: flex; /* Align items in a row */
     gap: 10px; /* Add space between items */
+
 }
 
 .desktopMenuButton[disabled] {
