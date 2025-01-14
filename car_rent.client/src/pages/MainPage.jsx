@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import Button from 'react-bootstrap/Button';
 
 // Components
 import Element from '../components/Element';
@@ -58,6 +59,7 @@ function MainPage() {
                 endDate: item.endDate,
                 startDate: item.startDate,
                 offerId: item.id,
+                location: item.location.name
             }));
 
             setCars(carsData);
@@ -77,7 +79,7 @@ function MainPage() {
     const uniqueBrands = cars.length > 0 ? [...new Set(cars.map((car) => car.brand))] : [];
     const uniqueModels = cars.length > 0 ? [...new Set(cars.map((car) => car.model))] : [];
     const uniqueYears = cars.length > 0 ? [...new Set(cars.map((car) => car.year))] : [];
-
+    const uniqueLocations = cars.length > 0 ? [...new Set(cars.map((car) => car.location))] : [];
 
     useEffect(() => {
         let filtered = cars;
@@ -94,13 +96,17 @@ function MainPage() {
             filtered = filtered.filter((car) => selectedYears.includes(car.year));
         }
 
+        if (selectedLocations.length > 0) {
+            filtered = filtered.filter((car) => selectedLocations.includes(car.location));
+        }
+
         filtered = filtered.filter(
             (car) => car.price >= priceRange[0] && car.price <= priceRange[1]
         );
 
         setFilteredCars(filtered);
         setCurrentPage(1);
-    }, [selectedBrands, selectedModels, selectedYears, cars, priceRange]);
+    }, [selectedBrands, selectedModels, selectedYears, cars, priceRange, selectedLocations]);
 
     const toggleSection = (section) => {
         setOpenSection((prev) => (prev === section ? null : section));
@@ -149,7 +155,7 @@ function MainPage() {
                 ) : (
                     <div className="filter-wrapper">
                         <div className="filters">
-                            <h2>Filter by:</h2>
+                            
                             <CollapsibleSectionGeneric
                                 title="Brands"
                                 isOpen={openSection === 'Brands'}
@@ -202,6 +208,23 @@ function MainPage() {
                                 />
                             </CollapsibleSectionGeneric>
                             <CollapsibleSectionGeneric
+                                title="Locations"
+                                isOpen={openSection === 'Locations'}
+                                toggle={() => toggleSection('Locations')}
+                            >
+                                <Filter
+                                    options={uniqueLocations}
+                                    selectedValues={selectedLocations}
+                                    onToggle={(location) =>
+                                        setSelectedLocations(
+                                            selectedLocations.includes(location)
+                                                ? selectedLocations.filter((item) => item !== location)
+                                                : [...selectedLocations, location]
+                                        )
+                                    }
+                                />
+                            </CollapsibleSectionGeneric>
+                            <CollapsibleSectionGeneric
                                 title="Booking Dates"
                                 isOpen={openSection === 'Booking Dates'}
                                 toggle={() => toggleSection('Booking Dates')}
@@ -218,13 +241,14 @@ function MainPage() {
                                 isOpen={openSection === 'Price Range'}
                                 toggle={() => toggleSection('Price Range')}
                             >
-                                <div className="price-range">
-                                    <Box sx={{ width: 200 }}>
+                                    <div className="price-range">
+                                        <Box sx={{ width: 200 }} >
                                         <Slider
                                             getAriaLabel={() => 'Price range'}
                                             value={priceRange}
                                             onChange={handleSliderChange}
                                             valueLabelDisplay="auto"
+                                            valueLabelFormat={(value) => `$${value}`} // Add "$" to the value
                                             min={0}
                                             max={maxPrice}
                                             step={1}
@@ -233,7 +257,7 @@ function MainPage() {
                                    
                                 </div>
                             </CollapsibleSectionGeneric>
-                            <button onClick={fetchCars} className="searchButton">Search</button>
+                            <Button onClick={fetchCars} className="searchButton">Search</Button>
                         </div>
                         <div className="contents">{contents}</div>
                     </div>
