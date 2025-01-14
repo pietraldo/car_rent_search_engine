@@ -124,12 +124,33 @@ namespace car_rent.Server.Controllers
         {
             // Get the authenticated user
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized("User not found");
-            }
             string clientId = user.Id.ToString();
 
+            ActionResult result = await CheckIfClientExistsInApi(clientId, user);
+            if(result != null)
+            {
+                return result;
+            }
+
+            // Proceed with the rent car operation
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentCar/{offerId}/{clientId}");
+            if (!rentCarResponse.IsSuccessStatusCode)
+            {
+                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
+            }
+
+            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
+            var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
+
+            await AddRentToDb(rentId, offerId, user);
+
+
+
+            return Redirect("/successfulRent");
+        }
+
+        private async Task<ActionResult> CheckIfClientExistsInApi(string clientId, ApplicationUser user)
+        {
             // Check if the user exists in the external API
             var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Client/checkClient/{clientId}");
             if (checkClientResponse.StatusCode == HttpStatusCode.NotFound)
@@ -151,43 +172,7 @@ namespace car_rent.Server.Controllers
             {
                 return StatusCode((int)checkClientResponse.StatusCode, "Error checking client in external API");
             }
-
-            // Proceed with the rent car operation
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentCar/{offerId}/{clientId}");
-            if (!rentCarResponse.IsSuccessStatusCode)
-            {
-                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
-            }
-
-            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
-            var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
-
-            await AddRentToDb(rentId, offerId, user);
-
-
-
-            return Redirect("/successfulRent");
-        }
-
-        private class CompanyRent
-        {
-            [JsonPropertyName("start")]
-            public DateTime Start { get; set; }
-
-            [JsonPropertyName("end")]
-            public DateTime End { get; set; }
-
-            [JsonPropertyName("carBrand")]
-            public string CarBrand { get; set; }
-
-            [JsonPropertyName("carModel")]
-            public string CarModel { get; set; }
-
-            [JsonPropertyName("carYear")]
-            public int CarYear { get; set; }
-
-            [JsonPropertyName("price")]
-            public float Price { get; set; }
+            return null;
         }
 
         private async Task AddRentToDb(int rentId, string offerId, ApplicationUser user)
