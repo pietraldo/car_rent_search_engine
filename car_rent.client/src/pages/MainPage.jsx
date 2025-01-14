@@ -11,6 +11,7 @@ import CollapsibleSectionGeneric from '../components/CollapsibleSectionGeneric';
 import CarDetails from '../pages/CarDetails';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Styles
 import '../Style/App.css';
@@ -28,6 +29,7 @@ function MainPage() {
     const location = useLocation();
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [maxPrice, setMaxPrice] = useState(10000);
     const carsPerPage = 5;
 
     const [startDate, setStartDate] = useState(new Date());
@@ -36,6 +38,7 @@ function MainPage() {
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow;
     });
+
 
     const fetchCars = async () => {
         setIsLoading(true);
@@ -49,7 +52,7 @@ function MainPage() {
             const rawResponseText = await response.text();
             const data = JSON.parse(rawResponseText);
 
-            console.log(data);
+            
             const carsData = data.map((item) => ({
                 model: item.car.model,
                 year: item.car.year,
@@ -64,10 +67,21 @@ function MainPage() {
 
             setCars(carsData);
             setFilteredCars(carsData);
+            console.log(carsData);
+            if (carsData.length > 0) {
+                const newMaxPrice = Math.max(...carsData.map((car) => car.price));
+                console.log(newMaxPrice);
+                setMaxPrice(newMaxPrice);
+                setPriceRange([0, newMaxPrice]); // Use newMaxPrice directly
+            } else {
+                setMaxPrice(10000);
+            }
+
         } catch (error) {
             console.error('Error fetching cars:', error);
             setCars([]);
             setFilteredCars([]);
+            setMaxPrice(10000);
         }
         setIsLoading(false);
     };
@@ -116,7 +130,6 @@ function MainPage() {
         setPriceRange(newValue);
     };
 
-    const maxPrice = cars.length > 0 ? Math.max(...cars.map((car) => car.price)) : 10000;
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
     const startIndex = (currentPage - 1) * carsPerPage;
     const currentCars = filteredCars.slice(startIndex, startIndex + carsPerPage);
@@ -151,7 +164,9 @@ function MainPage() {
         <div>
             {location.pathname === '/' && (
                 isLoading ? (
-                    <p>Loading filters...</p>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
+                        <CircularProgress size={60} />
+                    </Box>
                 ) : (
                     <div className="filter-wrapper">
                         <div className="filters">

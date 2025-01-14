@@ -30,8 +30,8 @@
 
 /* Car image */
 .car-photo-img {
-    width: 90%;
-    height: 90%;
+    width: 80%;
+    height: 80%;
     object-fit: contain; /* Make sure the image covers the entire container without stretching */
     background-color: #f0f0f0; /* Background color in case the image isn't loaded */
     border-radius: 8px;
@@ -93,15 +93,15 @@
     }
 
 /* Responsive Layout */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .car-details-container {
         flex-direction: column; /* Stack photo and content on smaller screens */
     }
 
     .car-photo {
-        max-width: 100%;
+        max-width: 80%;
         height: auto;
-        margin-right: 0;
+        margin-left: 10%;
     }
 
     .car-info {

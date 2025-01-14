@@ -89,7 +89,16 @@ const CarDetails = () => {
     return (
         <div className="car-details-container">
             <div className="car-photo">
-                <img src={carDetails.car.picture} alt="Car" className="car-photo-img" />
+                <img
+                    src={carDetails.car.picture || "..//..//dist//default.jpg"}
+                    alt="Car"
+                    className="car-photo-img"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "..//..//dist//default.jpg";
+
+                    }}
+                />
                 <Button className="rentButton2" onClick={handleClick}>
                     {buttonText}
                 </Button>
