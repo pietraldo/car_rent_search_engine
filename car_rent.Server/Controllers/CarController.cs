@@ -38,6 +38,9 @@ namespace car_rent.Server.Controllers
             _notificationService = notificationService;
         }
 
+        
+
+
         [HttpGet(Name = "GetCars")]
         public async Task<ActionResult<IEnumerable<OfferToDisplay>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
         {
@@ -49,48 +52,12 @@ namespace car_rent.Server.Controllers
             try
             {
                 var responseContent = await _httpClient.GetStringAsync(requestUrl);
-
-
-                List<OfferToDisplay> offersToDisplay = new List<OfferToDisplay>();
-
-                var jsonArray = JsonSerializer.Deserialize<JsonElement[]>(responseContent);
-
-                foreach (var offer in jsonArray)
-                {
-                    var car = offer.GetProperty("car");
-                    var model = car.GetProperty("model").GetString();
-                    var brand = car.GetProperty("brand").GetString();
-                    var year = car.GetProperty("year").GetInt32();
-                    var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
-
-
-                    CarToDisplay carObj = new CarToDisplay(brand, model, year, picture);
-
-                    // Create a new OfferToDisplay object
-
-                    OfferToDisplay offerToDisplay = new OfferToDisplay
-                    {
-                        Id = Guid.Parse(offer.GetProperty("id").GetString()),
-                        Car = carObj,
-                        ClientId = offer.GetProperty("clientId").GetString(),
-                        Price = offer.GetProperty("price").GetDouble(),
-                        StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
-                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString()),
-                        Location = car.GetProperty("location").Deserialize<Location>()
-                    };
-                     
-
-                    offersToDisplay.Add(offerToDisplay);
-                }
-
-
-
+                var offersToDisplay = JsonSerializer.Deserialize<OfferFromApi[]>(responseContent);
 
                 return Ok(offersToDisplay);
             }
             catch (Exception ex)
             {
-                // Handle any errors during the HTTP request
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -121,14 +88,14 @@ namespace car_rent.Server.Controllers
             }
         }
 
-
-        [Authorize]
         [HttpGet("sendEmail/{offerId}")]
         public async Task<ActionResult<string>> SendEmail(string offerId)
         {
-            //TODO: if user not logged in return failure
-
-            //TODO: Implement sending an email
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Ok("");
+            }
 
             string url = $"{Request.Scheme}://{Request.Host}";
 
@@ -144,9 +111,6 @@ namespace car_rent.Server.Controllers
             var json = await offerResponse.Content.ReadAsStreamAsync();
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
-
-
-            var user = await _userManager.GetUserAsync(User);
             
             _notificationService.Notify(offer, confirmationLink, user);
 

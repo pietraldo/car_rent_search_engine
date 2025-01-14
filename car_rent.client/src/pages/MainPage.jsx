@@ -59,7 +59,7 @@ function MainPage() {
                 endDate: item.endDate,
                 startDate: item.startDate,
                 offerId: item.id,
-                location: item.location.name
+                location: item.car.location.name
             }));
 
             setCars(carsData);
