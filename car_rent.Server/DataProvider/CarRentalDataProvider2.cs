@@ -68,6 +68,12 @@
             return rent;
         }
 
+        public async Task<bool> ReturnCar(string rentId)
+        {
+            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Rent/readyToReturn/{rentId}");
+            return rentCarResponse.IsSuccessStatusCode;
+        }
+
         public async Task<OfferFromApi?> GetOneOfferFromApi(string offerId)
         {
             var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");

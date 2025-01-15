@@ -120,12 +120,13 @@ namespace car_rent.Server.Controllers
 
             var rents = _carRentalProviders.Select(provider => provider.RentCar(offerId, user, clientId).Result).ToList();
 
-            var rent = rents[1];
+            var rent = rents[0];
 
             if (rent == null)
             {
                 return NotFound("Rent not found");
             }
+            //TODO: make this find real company
             Company company = _context.Companies.FirstOrDefault();
             await AddRentToDb(rent, offerId, user, company);
 
@@ -155,8 +156,8 @@ namespace car_rent.Server.Controllers
                 Car = new Car(rentInfoFromApi.CarBrand, rentInfoFromApi.CarModel, rentInfoFromApi.CarYear, string.Empty),
                 Rent = newRent,
                 ClientId = user.Id.ToString(),
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(7)
+                StartDate = rentInfoFromApi.StartDate,
+                EndDate = rentInfoFromApi.EndDate
             };
 
             _context.Offers.Add(newOffer);

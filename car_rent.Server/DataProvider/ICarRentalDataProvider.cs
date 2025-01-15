@@ -9,5 +9,6 @@ namespace car_rent.Server.DataProvider
         Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId="", string email="");
         Task<OfferFromApi> GetOneOfferFromApi(string offerId);
         Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId);
+        Task<bool> ReturnCar(string rentId);
     }
 }

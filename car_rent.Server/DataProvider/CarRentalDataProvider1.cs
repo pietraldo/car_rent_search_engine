@@ -11,6 +11,7 @@
     using car_rent.Server.DTOs;
     using System.Text.Json.Serialization;
     using car_rent_api2.Server.Database;
+    using System.Net.Http;
 
     public class OfferForCarSearchDto
     {
@@ -73,6 +74,18 @@
             public DateTime EndDate { get; set; }
             [JsonPropertyName("rentalCompanyRentId")]
             public int RentalCompanyRentId { get; set; }
+        }
+
+        public async Task<bool> ReturnCar(string rentId)
+        {
+            var url = $"{_apiUrl}/api/Rents/set-rent-status-ready-to-return";
+            var client = GetClientWithBearerToken();
+            var json = JsonSerializer.Serialize(int.Parse(rentId));
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url,data);
+            response.EnsureSuccessStatusCode();
+
+            return true;
         }
 
         public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)

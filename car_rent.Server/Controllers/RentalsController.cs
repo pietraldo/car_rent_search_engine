@@ -1,4 +1,5 @@
-﻿using car_rent.Server.Migrations;
+﻿using car_rent.Server.DataProvider;
+using car_rent.Server.Migrations;
 using car_rent.Server.Model;
 using car_rent_api2.Server.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -16,13 +17,17 @@ namespace car_rent.Server.Controllers
         private readonly SearchEngineDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly string _apiUrl;
+        private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
-        public RentalsController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context)
+        public RentalsController(HttpClient httpClient, string car_rent_company_api1, 
+            UserManager<ApplicationUser> userManager, SearchEngineDbContext context,
+            IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
             _userManager = userManager;
             _apiUrl = car_rent_company_api1;
             _context = context;
+            _carRentalProviders = carRentalProviders.ToList();
         }
         [HttpGet("rents")]
         public async Task<ActionResult<IEnumerable<Rent>>> Get()
@@ -51,11 +56,7 @@ namespace car_rent.Server.Controllers
                 return NotFound("User not found.");
             }
 
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Rent/readyToReturn/{rentId}");
-            if (!rentCarResponse.IsSuccessStatusCode)
-            {
-                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
-            }
+            _carRentalProviders[0].ReturnCar(rentId);
 
             var rent = await _context.History
                 .Where(r => r.RentId_in_company == rentId)
