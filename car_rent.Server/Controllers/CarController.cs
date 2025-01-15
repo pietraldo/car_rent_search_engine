@@ -25,17 +25,15 @@ namespace car_rent.Server.Controllers
     {
 
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly INotificationService _notificationService;
         private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager,
+        public CarController(HttpClient httpClient, UserManager<ApplicationUser> userManager,
             SearchEngineDbContext context, INotificationService notificationService, IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
-            _apiUrl = car_rent_company_api1;
             _userManager = userManager;
             _context = context;
             _notificationService = notificationService;
@@ -52,35 +50,80 @@ namespace car_rent.Server.Controllers
             string clientId = (user == null ? "" : user.Id.ToString());
             string email = (user == null ? "" : user.Email);
 
-            List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result).ToList();
+            var offerTasks = _carRentalProviders.Select(provider =>
+            {
+                return Task.Run(async () =>
+                {
+                    try
+                    {
+                        return await provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email);
+                    }
+                    catch
+                    {
+                        // Log or handle individual task failure here
+                        return Enumerable.Empty<OfferFromApi>();
+                    }
+                });
+            });
 
-            return offers;
+            // Run all tasks and allow up to 5 seconds for completion
+            var timeoutTask = Task.Delay(5000);
+            var allTasks = Task.WhenAll(offerTasks);
+
+            // Wait for either all tasks to complete or timeout
+            var completedTask = await Task.WhenAny(allTasks, timeoutTask);
+
+            // Gather results from successfully completed tasks
+            if (completedTask == allTasks)
+            {
+                // If all tasks completed within 5 seconds
+                return allTasks.Result.SelectMany(x => x).ToList();
+            }
+            else
+            {
+                // Timeout: Gather completed results so far
+                var completedOffers = new List<OfferFromApi>();
+                foreach (var task in offerTasks)
+                {
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        completedOffers.AddRange(await task);
+                    }
+                }
+                return completedOffers;
+            }
+
+            //List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result).ToList();
+            //List<OfferFromApi> offers = _carRentalProviders[1].GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result;
+            //return offers;
         }
 
         [HttpGet("getdetails/{offerId:guid}")]
         public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            string clientId = user?.Id.ToString() ?? string.Empty;
 
-            var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
-            try
-            {
-                var responseContent = await _httpClient.GetStringAsync(requestUrl);
-                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
+            return Ok();
+            //var user = await _userManager.GetUserAsync(User);
+            //string clientId = user?.Id.ToString() ?? string.Empty;
 
-                if (carDetails != null)
-                {
-                    carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
-                    return Ok(carDetails);
-                }
+            //var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
+            //try
+            //{
+            //    var responseContent = await _httpClient.GetStringAsync(requestUrl);
+            //    var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
 
-                return NotFound("Car details not found.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            //    if (carDetails != null)
+            //    {
+            //        carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
+            //        return Ok(carDetails);
+            //    }
+
+            //    return NotFound("Car details not found.");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return StatusCode(500, $"Internal server error: {ex.Message}");
+            //}
         }
 
         [HttpGet("sendEmail/{offerIdPlusProvider}")]
@@ -89,15 +132,13 @@ namespace car_rent.Server.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound("Offer not found");
+                return NotFound("User not found");
             }
 
             string url = $"{Request.Scheme}://{Request.Host}";
 
             // Build the confirmation link
             string confirmationLink = $"{url}/Car/confirmationLink/{offerIdPlusProvider}";
-
-            await Console.Out.WriteLineAsync(confirmationLink);
 
             OfferFromApi? offer = null;
             foreach (var provider in _carRentalProviders)

@@ -22,11 +22,11 @@
         private readonly string _accessToken;
         private readonly string _apiUrl1;
 
-        public CarRentalDataProvider1(IHttpClientFactory httpClientFactory, string apiUrl1)
+        public CarRentalDataProvider1(IHttpClientFactory httpClientFactory, string[] apiUrls)
         {
             _httpClientFactory = httpClientFactory;
             _accessToken = GenerateAccessToken();
-            _apiUrl1 = apiUrl1;
+            _apiUrl1 = apiUrls[1];
         }
 
         public string GetProviderName()
@@ -140,7 +140,7 @@
         private string GenerateAccessToken()
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes("ded6e96cb51a701c4dc9edacb75b74bb3405a6be6637f2cb06148a396e39b15a");
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("CAR_RENTAL_SECRET_KEY"));
             List<Claim> claims = new List<Claim>();
             Claim backendClaim = new Claim("Backend", "1");
             claims.Add(backendClaim);

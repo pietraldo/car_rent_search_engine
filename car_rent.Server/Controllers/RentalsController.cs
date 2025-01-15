@@ -16,16 +16,14 @@ namespace car_rent.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl;
         private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
-        public RentalsController(HttpClient httpClient, string car_rent_company_api1, 
+        public RentalsController(HttpClient httpClient, 
             UserManager<ApplicationUser> userManager, SearchEngineDbContext context,
             IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
             _userManager = userManager;
-            _apiUrl = car_rent_company_api1;
             _context = context;
             _carRentalProviders = carRentalProviders.ToList();
         }

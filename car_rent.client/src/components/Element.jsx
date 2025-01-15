@@ -9,7 +9,7 @@ function Element({ car, apiUrl}) {
     const [buttonText, setButtonText] = useState("Rent me!");
     const navigate = useNavigate();
 
-    console.log(car);
+   
 
     const handleClick = () => {
 

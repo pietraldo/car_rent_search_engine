@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
 using car_rent.Server.DataProvider;
+using Microsoft.Extensions.ObjectPool;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,11 +69,15 @@ builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider2>();
 
 builder.Services.AddHttpLogging(o => { });
 
-var apiUrl1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
-builder.Services.AddSingleton<string>(apiUrl1);
+
 
 var apiUrl2 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API2")?? throw new InvalidOperationException("Missing car rent company API URL");
-builder.Services.AddSingleton<string>(apiUrl2);
+var apiUrl1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1") ?? throw new InvalidOperationException("Missing car rent company API URL");
+
+string[] apiUrls = { apiUrl1, apiUrl2 };
+
+builder.Services.AddSingleton(apiUrls);
+
 
 builder.Services.AddSingleton<INotificationService, MailGunService>();
 

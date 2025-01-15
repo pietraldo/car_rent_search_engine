@@ -23,10 +23,10 @@
         private readonly string _accessToken;
         private readonly string _apiUrl2;
 
-        public CarRentalDataProvider2(HttpClient httpClient, string apiUrl2)
+        public CarRentalDataProvider2(HttpClient httpClient, string[] apiUrls)
         {
             _httpClient = httpClient;
-            _apiUrl2 = apiUrl2;
+            _apiUrl2 = apiUrls[0];
         }
 
         public string GetProviderName()
@@ -96,6 +96,7 @@
                 foreach (var offer in offerFromApi)
                 {
                     offer.IdPlusProvider = AddProviderName(offer.IdPlusProvider);
+                    offer.Car.Photo = $"{_apiUrl2}/{offer.Car.Photo}";
                 }
 
                 return offerFromApi != null ? offerFromApi.ToList() : new List<OfferFromApi>();
