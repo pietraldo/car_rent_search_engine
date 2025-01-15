@@ -17,7 +17,7 @@
     using System.Text.Json.Serialization;
 
    
-    public class CarRentalDataProvider2 : ICarRentalDataProvider
+    public class CarRentalDataProvider2 : CarRentalDataProvider
     {
         private readonly HttpClient _httpClient;
         private readonly string _accessToken;
@@ -29,26 +29,12 @@
             _apiUrl2 = apiUrls[0];
         }
 
-        public string GetProviderName()
+        public override string GetProviderName()
         {
             return "DriveEasy";
         }
 
-        public string AddProviderName(string offerId)
-        {
-            return offerId+ "*" + GetProviderName();
-        }
-        public string RemoveProviderName(string offerIdPlusProvider)
-        {
-            return offerIdPlusProvider.Split("*")[0];
-        }
-
-        public bool CheckIfMyOffer(string offerIdPlusProvider)
-        {
-            return offerIdPlusProvider.Contains(GetProviderName());
-        }
-
-        public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
+        public override async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
         {
             bool result = await CheckIfClientExistsInApi(clientId, user);
             if (!result) return null;
@@ -65,13 +51,13 @@
             return rent;
         }
 
-        public async Task<bool> ReturnCar(string rentId)
+        public override async Task<bool> ReturnCar(string rentId)
         {
             var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl2}/api/Rent/readyToReturn/{rentId}");
             return rentCarResponse.IsSuccessStatusCode;
         }
 
-        public async Task<OfferFromApi?> GetOneOfferFromApi(string offerId)
+        public override async Task<OfferFromApi?> GetOneOfferFromApi(string offerId)
         {
             var offerResponse = await _httpClient.GetAsync($"{_apiUrl2}/api/Offer/id/{offerId}");
             if (!offerResponse.IsSuccessStatusCode)
@@ -84,7 +70,7 @@
             return offer;
         }
 
-        public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
+        public override async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
         {
             var requestUrl = $"{_apiUrl2}/api/offer?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&brand={search_brand}&model={search_model}&clientId={clientId}";
 
@@ -107,7 +93,7 @@
             }
         }
 
-        public async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
+        public override async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
         {
             var requestUrl = $"{_apiUrl2}/api/offer/id/{offerId}";
             try

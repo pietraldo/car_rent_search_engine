@@ -16,7 +16,7 @@
 
 
 
-    public class CarRentalDataProvider1 : ICarRentalDataProvider
+    public class CarRentalDataProvider1 : CarRentalDataProvider
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _accessToken;
@@ -29,29 +29,12 @@
             _apiUrl1 = apiUrls[1];
         }
 
-        public string GetProviderName()
+        public override string GetProviderName()
         {
             return "CarRental";
         }
-
-        public string AddProviderName(string offerId)
-        {
-            return offerId + "*" + GetProviderName();
-        }
-        public string RemoveProviderName(string offerIdPlusProvider)
-        {
-            return offerIdPlusProvider.Split("*")[0];
-        }
-
-        public bool CheckIfMyOffer(string offerIdPlusProvider)
-        {
-            return offerIdPlusProvider.Contains(GetProviderName());
-        }
-
-
-
-
-        public async Task<bool> ReturnCar(string rentId)
+        
+        public override async Task<bool> ReturnCar(string rentId)
         {
             var url = $"{_apiUrl1}/api/Rents/set-rent-status-ready-to-return";
             var client = GetClientWithBearerToken();
@@ -63,7 +46,7 @@
             return true;
         }
 
-        public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
+        public override async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
         {
             var url = $"{_apiUrl1}/api/rents/create-new-rent";
             var newRentParameters = new NewRentParametersDto() { OfferId = offerId, Email = user.Email };
@@ -80,7 +63,7 @@
             return rent;
         }
 
-        public async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
+        public override async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
         {
             OfferFromApi offer = await GetOneOfferFromApi(offerId);
             Car car = new Car(offer.Car.Brand,offer.Car.Model, -1,  "");
@@ -91,7 +74,7 @@
             return new CarDetailsToDisplay() { Car=car, Price=offer.Price, CarDetails=carDetails, CarServices=carServices, Location=offer.Car.Location, StartDate=offer.StartDate, EndDate=offer.EndDate };
         }
 
-        public async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
+        public override async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
         {
             var url = $"{_apiUrl1}/api/offers/offer/{offerId}";
             var client = GetClientWithBearerToken();
@@ -102,7 +85,7 @@
             return new OfferFromApi() { IdPlusProvider = offerId, Price = (double)offer.Price, Car = new CarFromAPi() { Brand = offer.Brand, Model = offer.Model } };
         }
 
-        public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
+        public override async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
         {
 
             if (email.IsNullOrEmpty())

@@ -38,6 +38,7 @@ namespace car_rent.Server.Controllers
 
             var rents = await _context.History
                 .Where(r => r.User == user)
+                .Include(c=> c.Company)
                 .Include(r => r.Offer)
                 .Include(r=>r.Offer.Car)
                 .ToListAsync();
