@@ -12,6 +12,7 @@ jobs:
     env:
       DB_CONNECTION_STRING_WYSZUKIWARKA: ${{ secrets.DB_CONNECTION_STRING_WYSZUKIWARKA }}
       DOTNET_CARRENT_API1: ${{secrets.DOTNET_CARRENT_API1}}
+      DOTNET_CARRENT_API2: ${{secrets.DOTNET_CARRENT_API2}}
 
     steps:
       # Checkout the repository
