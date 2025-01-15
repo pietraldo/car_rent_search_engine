@@ -32,7 +32,8 @@ public class IdentityController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GoogleLogout()
     {
-        Response.Cookies.Delete("UserEmail"); 
+        Response.Cookies.Delete("UserEmail");
+        await _signInManager.SignOutAsync();
         return Redirect("/"); 
     }
 

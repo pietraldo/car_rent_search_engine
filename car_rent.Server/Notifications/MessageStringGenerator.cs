@@ -5,7 +5,7 @@ namespace car_rent.Server.Notifications;
 
 public class HtmlMessageGenerator : IMessageGenerator
 {
-    public string GenerateOfferMessage(OfferToDisplay offer, string confirmationLink)
+    public string GenerateOfferMessage(OfferFromApi offer, string confirmationLink)
     {
         return $@"<html>
 <body>
@@ -28,5 +28,5 @@ Confirm Order
 
 public interface IMessageGenerator
 {
-    public string GenerateOfferMessage(OfferToDisplay offer, string confirmationLink);
+    public string GenerateOfferMessage(OfferFromApi offer, string confirmationLink);
 }
