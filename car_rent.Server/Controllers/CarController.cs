@@ -92,19 +92,24 @@ namespace car_rent.Server.Controllers
                 }
                 return completedOffers;
             }
-
-            //List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result).ToList();
-            //List<OfferFromApi> offers = _carRentalProviders[1].GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result;
-            //return offers;
         }
 
-        [HttpGet("getdetails/{offerId:guid}")]
-        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
+        [HttpGet("getdetails/{offerIdPlusProvider}")]
+        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerIdPlusProvider)
         {
 
-            return Ok();
-            //var user = await _userManager.GetUserAsync(User);
-            //string clientId = user?.Id.ToString() ?? string.Empty;
+            foreach (var provider in _carRentalProviders)
+            {
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
+                {
+                    string offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    var carDetailsToDisplay = provider.GetCarDetailsToDisplay(offerId).Result;
+                    return carDetailsToDisplay;
+                }
+            }
+
+            return NotFound();
+           
 
             //var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
             //try
@@ -125,7 +130,7 @@ namespace car_rent.Server.Controllers
             //    return StatusCode(500, $"Internal server error: {ex.Message}");
             //}
         }
-
+        
         [HttpGet("sendEmail/{offerIdPlusProvider}")]
         public async Task<ActionResult<string>> SendEmail(string offerIdPlusProvider)
         {

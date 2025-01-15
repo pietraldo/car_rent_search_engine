@@ -14,7 +14,7 @@
     using System.Net.Http;
     using car_rent.Server.Migrations;
 
-    
+
 
     public class CarRentalDataProvider1 : ICarRentalDataProvider
     {
@@ -48,8 +48,8 @@
             return offerIdPlusProvider.Contains(GetProviderName());
         }
 
-       
-       
+
+
 
         public async Task<bool> ReturnCar(string rentId)
         {
@@ -57,7 +57,7 @@
             var client = GetClientWithBearerToken();
             var json = JsonSerializer.Serialize(int.Parse(rentId));
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url,data);
+            var response = await client.PostAsync(url, data);
             response.EnsureSuccessStatusCode();
 
             return true;
@@ -75,9 +75,20 @@
             var responseString = await response.Content.ReadAsStringAsync();
             var new_search_rent = JsonSerializer.Deserialize<NewSearchRentDto>(responseString);
 
-            var rent =new RentInfoFromApi() { RentId = new_search_rent.RentalCompanyRentId.ToString(), StartDate = new_search_rent.StartDate, EndDate = new_search_rent.EndDate, CarBrand = new_search_rent.Brand, CarModel = new_search_rent.Model, CarYear = -1, Price = 33542};
+            var rent = new RentInfoFromApi() { RentId = new_search_rent.RentalCompanyRentId.ToString(), StartDate = new_search_rent.StartDate, EndDate = new_search_rent.EndDate, CarBrand = new_search_rent.Brand, CarModel = new_search_rent.Model, CarYear = -1, Price = 33542 };
 
             return rent;
+        }
+
+        public async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
+        {
+            OfferFromApi offer = await GetOneOfferFromApi(offerId);
+            Car car = new Car(offer.Car.Brand,offer.Car.Model, -1,  "");
+
+            List<CarDetail> carDetails = new List<CarDetail>();
+            List<CarService> carServices = new List<CarService>();
+
+            return new CarDetailsToDisplay() { Car=car, Price=offer.Price, CarDetails=carDetails, CarServices=carServices, Location=offer.Car.Location, StartDate=offer.StartDate, EndDate=offer.EndDate };
         }
 
         public async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
@@ -88,13 +99,13 @@
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var offer = JsonSerializer.Deserialize<CachedOfferDto>(responseString);
-            return new OfferFromApi() { IdPlusProvider = offerId, Price= (double)offer.Price, Car = new CarFromAPi() {Brand= offer.Brand, Model = offer.Model } };
+            return new OfferFromApi() { IdPlusProvider = offerId, Price = (double)offer.Price, Car = new CarFromAPi() { Brand = offer.Brand, Model = offer.Model } };
         }
 
         public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
         {
-            
-            if(email.IsNullOrEmpty())
+
+            if (email.IsNullOrEmpty())
             {
                 email = "emptyEmail";
             }
@@ -107,7 +118,7 @@
 
 
             List<OfferFromApi> result = new List<OfferFromApi>();
-            foreach(var offer in offers)
+            foreach (var offer in offers)
             {
                 OfferFromApi offerFromApi = new OfferFromApi();
                 offerFromApi.IdPlusProvider = AddProviderName(offer.OfferId);
@@ -129,7 +140,7 @@
         }
 
 
-       
+
         private HttpClient GetClientWithBearerToken()
         {
             var client = _httpClientFactory.CreateClient();
@@ -155,7 +166,7 @@
             return tokenHandler.WriteToken(token);
         }
 
-        
+
     }
 
 }

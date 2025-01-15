@@ -107,6 +107,28 @@
             }
         }
 
+        public async Task<CarDetailsToDisplay> GetCarDetailsToDisplay(string offerId)
+        {
+            var requestUrl = $"{_apiUrl2}/api/offer/id/{offerId}";
+            try
+            {
+                var responseContent = await _httpClient.GetStringAsync(requestUrl);
+                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
+
+                if (carDetails != null)
+                {
+                    carDetails.Car.Picture = $"{_apiUrl2}/{carDetails.Car.Picture}";
+                    return carDetails;
+                }
+
+                return new CarDetailsToDisplay();
+            }
+            catch (Exception ex)
+            {
+                return new CarDetailsToDisplay();
+            }
+        }
+
         private async Task<bool> CheckIfClientExistsInApi(string clientId, ApplicationUser user)
         {
             // Check if the user exists in the external API
