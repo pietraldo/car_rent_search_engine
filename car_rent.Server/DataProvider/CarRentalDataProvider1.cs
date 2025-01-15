@@ -37,6 +37,27 @@
         public string Email { get; set; }
     }
 
+    public class CachedOfferDto
+    {
+        [JsonPropertyName("carId")]
+        public int CarId { get; set; }
+        [JsonPropertyName("brand")]
+        public string Brand { get; set; }
+        [JsonPropertyName("model")]
+        public string Model { get; set; }
+        [JsonPropertyName("price")]
+        public decimal Price { get; set; }
+        public string Conditions { get; set; }
+        [JsonPropertyName("companyName")]
+        public string CompanyName { get; set; }
+        [JsonPropertyName("location")]
+        public string Location { get; set; }
+        [JsonPropertyName("startDate")]
+        public DateTime StartDate { get; set; }
+        [JsonPropertyName("endDate")]
+        public DateTime EndDate { get; set; }
+    }
+
     public class CarRentalDataProvider1 : ICarRentalDataProvider
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -107,7 +128,13 @@
 
         public async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
         {
-            return new OfferFromApi() { Id=offerId, Price=33, Car = new CarFromAPi() {Brand="test brand", Model = "test model" } };
+            var url = $"{_apiUrl}/api/offers/offer/{offerId}";
+            var client = GetClientWithBearerToken();
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var offer = JsonSerializer.Deserialize<CachedOfferDto>(responseString);
+            return new OfferFromApi() { Id=offerId, Price= (double)offer.Price, Car = new CarFromAPi() {Brand= offer.Brand, Model = offer.Model } };
         }
 
         public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
