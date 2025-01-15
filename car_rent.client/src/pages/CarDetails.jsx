@@ -125,6 +125,27 @@ const CarDetails = () => {
                     </ul>
                 </div>
 
+                {/* Car details Section */}
+                <div className="section">
+                    <h2 className="subtitle">Car details</h2>
+                    {carDetails.carDetails && carDetails.carDetails.length > 0 ? (
+                        <ul className="list">
+                            {carDetails.carDetails.map((detail) => (
+                                <li className="list-item" key={detail.id}>
+                                    <span className="textInfo"><strong> {detail.description}</strong>
+                                        { detail.value ? (
+                                            `: ${detail.value}`
+                                        ) : null }
+                                        <br />
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No car details available.</p>
+                    )}
+                </div>
+
                 {/* Services Section */}
                 <div className="section">
                     <h2 className="subtitle">Available Services</h2>
@@ -150,6 +171,7 @@ const CarDetails = () => {
                     )}
                 </div>
 
+                
                 {/* Location Section */}
                 <div className="section">
                     <h2 className="subtitle">Location</h2>

@@ -99,9 +99,9 @@
     }
 
     .car-photo {
-        max-width: 80%;
+        max-width: 100%;
         height: auto;
-        margin-left: 10%;
+        margin-inline: auto;
     }
 
     .car-info {
