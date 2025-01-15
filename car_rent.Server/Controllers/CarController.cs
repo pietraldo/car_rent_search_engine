@@ -109,26 +109,6 @@ namespace car_rent.Server.Controllers
             }
 
             return NotFound();
-           
-
-            //var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
-            //try
-            //{
-            //    var responseContent = await _httpClient.GetStringAsync(requestUrl);
-            //    var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
-
-            //    if (carDetails != null)
-            //    {
-            //        carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
-            //        return Ok(carDetails);
-            //    }
-
-            //    return NotFound("Car details not found.");
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(500, $"Internal server error: {ex.Message}");
-            //}
         }
         
         [HttpGet("sendEmail/{offerIdPlusProvider}")]
