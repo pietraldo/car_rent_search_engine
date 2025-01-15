@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../Style/CarDetails.css';
 import LocationMap from '../components/LocationMap';
 import Button from 'react-bootstrap/Button';
+import Alert from '../components/Alert';
 
 // Utility function to format dates
 const formatDate = (dateString) => {
@@ -41,18 +42,21 @@ const CarDetails = () => {
     const handleClick = () => {
         if (!isRented) {
             setIsRented(true);
-            async function sendEmail() {
-                console.log(carDetails.startDate, carDetails.endDate, carDetails.brand, carDetails.price);
-                const response = await fetch(`Car/sendEmail/${carDetails.offerId}`);
-                if (response.ok) {
-                    alert("Email sent! Please confirm your rent.");
+            async function sendEmail()
+            {
+                console.log(`/Car/sendEmail/${offerId}`);
+                const response = await fetch(`/Car/sendEmail/${offerId}`);
+                if (response.ok)
+                {
+                    Alert("green", "Email sent! Please confirm your rent.");
                     const link = await response.text();
                     console.log(link);
                 }
             }
             sendEmail();
-        } else {
-            alert("You have already rented this car.");
+        } else
+        {
+            Alert("yellow", "You have already rented this car.");
         }
     };
 

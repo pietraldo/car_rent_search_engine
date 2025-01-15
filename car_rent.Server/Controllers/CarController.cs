@@ -10,9 +10,11 @@ using System.Text;
 using System.ComponentModel.Design;
 using car_rent.Server.Migrations;
 using System.Text.Json.Serialization;
+using car_rent.Server.DTOs;
 using System.Text.Json.Nodes;
 using Microsoft.VisualBasic;
 using car_rent.Server.Notifications;
+using car_rent.Server.DataProvider;
 
 
 namespace car_rent.Server.Controllers
@@ -23,130 +25,120 @@ namespace car_rent.Server.Controllers
     {
 
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly INotificationService _notificationService;
+        private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context, INotificationService notificationService)
+        public CarController(HttpClient httpClient, UserManager<ApplicationUser> userManager,
+            SearchEngineDbContext context, INotificationService notificationService, IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
-            _apiUrl = car_rent_company_api1;
             _userManager = userManager;
             _context = context;
             _notificationService = notificationService;
+            _carRentalProviders = carRentalProviders.ToList();
         }
 
+
+
+
         [HttpGet(Name = "GetCars")]
-        public async Task<ActionResult<IEnumerable<OfferToDisplay>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
+        public async Task<ActionResult<IEnumerable<OfferFromApi>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
         {
             var user = await _userManager.GetUserAsync(User);
             string clientId = (user == null ? "" : user.Id.ToString());
+            string email = (user == null ? "" : user.Email);
 
-            var requestUrl = $"{_apiUrl}/api/offer?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&brand={search_brand}&model={search_model}&clientId={clientId}";
-
-            try
+            var offerTasks = _carRentalProviders.Select(provider =>
             {
-                var responseContent = await _httpClient.GetStringAsync(requestUrl);
-
-
-                List<OfferToDisplay> offersToDisplay = new List<OfferToDisplay>();
-
-                var jsonArray = JsonSerializer.Deserialize<JsonElement[]>(responseContent);
-
-                foreach (var offer in jsonArray)
+                return Task.Run(async () =>
                 {
-                    var car = offer.GetProperty("car");
-                    var model = car.GetProperty("model").GetString();
-                    var brand = car.GetProperty("brand").GetString();
-                    var year = car.GetProperty("year").GetInt32();
-                    var picture = _apiUrl + "/" + car.GetProperty("photo").GetString();
-
-
-                    CarToDisplay carObj = new CarToDisplay(brand, model, year, picture);
-
-                    // Create a new OfferToDisplay object
-
-                    OfferToDisplay offerToDisplay = new OfferToDisplay
+                    try
                     {
-                        Id = Guid.Parse(offer.GetProperty("id").GetString()),
-                        Car = carObj,
-                        ClientId = offer.GetProperty("clientId").GetString(),
-                        Price = offer.GetProperty("price").GetDouble(),
-                        StartDate = DateTime.Parse(offer.GetProperty("startDate").GetString()),
-                        EndDate = DateTime.Parse(offer.GetProperty("endDate").GetString()),
-                        Location = car.GetProperty("location").Deserialize<Location>()
-                    };
-                     
+                        return await provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email);
+                    }
+                    catch
+                    {
+                        // Log or handle individual task failure here
+                        return Enumerable.Empty<OfferFromApi>();
+                    }
+                });
+            });
 
-                    offersToDisplay.Add(offerToDisplay);
-                }
+            // Run all tasks and allow up to 5 seconds for completion
+            var timeoutTask = Task.Delay(5000);
+            var allTasks = Task.WhenAll(offerTasks);
 
+            // Wait for either all tasks to complete or timeout
+            var completedTask = await Task.WhenAny(allTasks, timeoutTask);
 
-
-
-                return Ok(offersToDisplay);
-            }
-            catch (Exception ex)
+            // Gather results from successfully completed tasks
+            if (completedTask == allTasks)
             {
-                // Handle any errors during the HTTP request
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                // If all tasks completed within 5 seconds
+                return allTasks.Result.SelectMany(x => x).ToList();
+            }
+            else
+            {
+                // Timeout: Gather completed results so far
+                var completedOffers = new List<OfferFromApi>();
+                foreach (var task in offerTasks)
+                {
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        completedOffers.AddRange(await task);
+                    }
+                }
+                return completedOffers;
             }
         }
 
-        [HttpGet("getdetails/{offerId:guid}")]
-        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerId)
+        [HttpGet("getdetails/{offerIdPlusProvider}")]
+        public async Task<ActionResult<CarDetailsToDisplay>> Get(string offerIdPlusProvider)
+        {
+
+            foreach (var provider in _carRentalProviders)
+            {
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
+                {
+                    string offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    var carDetailsToDisplay = provider.GetCarDetailsToDisplay(offerId).Result;
+                    return carDetailsToDisplay;
+                }
+            }
+
+            return NotFound();
+        }
+        
+        [HttpGet("sendEmail/{offerIdPlusProvider}")]
+        public async Task<ActionResult<string>> SendEmail(string offerIdPlusProvider)
         {
             var user = await _userManager.GetUserAsync(User);
-            string clientId = user?.Id.ToString() ?? string.Empty;
-
-            var requestUrl = $"{_apiUrl}/api/offer/id/{offerId}";
-            try
+            if (user == null)
             {
-                var responseContent = await _httpClient.GetStringAsync(requestUrl);
-                var carDetails = JsonSerializer.Deserialize<CarDetailsToDisplay>(responseContent);
-
-                if (carDetails != null)
-                {
-                    carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
-                    return Ok(carDetails);
-                }
-                
-                return NotFound("Car details not found.");
+                return NotFound("User not found");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-
-        [Authorize]
-        [HttpGet("sendEmail/{offerId}")]
-        public async Task<ActionResult<string>> SendEmail(string offerId)
-        {
-            //TODO: if user not logged in return failure
-
-            //TODO: Implement sending an email
 
             string url = $"{Request.Scheme}://{Request.Host}";
 
             // Build the confirmation link
-            string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
+            string confirmationLink = $"{url}/Car/confirmationLink/{offerIdPlusProvider}";
 
-            var offerResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/id/{offerId}");
-            if (!offerResponse.IsSuccessStatusCode)
+            OfferFromApi? offer = null;
+            foreach (var provider in _carRentalProviders)
             {
-                return StatusCode(500, "Error getting offer from external API");
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
+                {
+                    string offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    offer = provider.GetOneOfferFromApi(offerId).Result;
+                    break;
+                }
             }
-
-            var json = await offerResponse.Content.ReadAsStreamAsync();
-            var jsonString = await offerResponse.Content.ReadAsStringAsync();
-            var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
-
-
-            var user = await _userManager.GetUserAsync(User);
-            
+            if (offer == null)
+            {
+                return NotFound("Offer not found");
+            }
             _notificationService.Notify(offer, confirmationLink, user);
 
 
@@ -154,107 +146,62 @@ namespace car_rent.Server.Controllers
         }
 
         [Authorize]
-        [HttpGet("confirmationLink/{offerId}")]
-        public async Task<ActionResult> ConfirmationLink(string offerId)
+        [HttpGet("confirmationLink/{offerIdPlusProvider}")]
+        public async Task<ActionResult> ConfirmationLink(string offerIdPlusProvider)
         {
             // Get the authenticated user
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized("User not found");
-            }
             string clientId = user.Id.ToString();
 
-            // Check if the user exists in the external API
-            var checkClientResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Client/checkClient/{clientId}");
-            if (checkClientResponse.StatusCode == HttpStatusCode.NotFound)
+            RentInfoFromApi? rent = null;
+            string offerId = string.Empty;
+            string companyName = string.Empty;
+            foreach (var provider in _carRentalProviders)
             {
-                // Prepare and send user information to the external API
-                string name = user.UserName ?? "";
-                string surname = user.LastName ?? "";
-                var userInformation = new { Id = clientId, Name = name, Surname = surname, Email = user.Email };
-                var userInformationJson = JsonSerializer.Serialize(userInformation);
-                var content = new StringContent(userInformationJson, Encoding.UTF8, "application/json");
-
-                var createClientResponse = await _httpClient.PostAsync($"{_apiUrl}/api/Client/createClient", content);
-                if (!createClientResponse.IsSuccessStatusCode)
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
                 {
-                    return StatusCode((int)createClientResponse.StatusCode, "Failed to create client in external API");
+                    offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    companyName = provider.GetProviderName();
+                    rent = provider.RentCar(offerId, user, clientId).Result;
+                    break;
                 }
             }
-            else if (!checkClientResponse.IsSuccessStatusCode)
+            if (rent == null)
             {
-                return StatusCode((int)checkClientResponse.StatusCode, "Error checking client in external API");
+                return NotFound("Rent not found");
             }
 
-            // Proceed with the rent car operation
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Offer/rentCar/{offerId}/{clientId}");
-            if (!rentCarResponse.IsSuccessStatusCode)
-            {
-                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
-            }
-
-            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
-            var rentId = JsonSerializer.Deserialize<int>(rentCarResponseContent);
-
-            await AddRentToDb(rentId, offerId, user);
-
-
+            Company company = _context.Companies.FirstOrDefault(c=> c.Name==companyName);
+            await AddRentToDb(rent, offerId, user, company);
 
             return Redirect("/successfulRent");
         }
 
-        private class CompanyRent
+
+
+        private async Task AddRentToDb(RentInfoFromApi rentInfoFromApi, string offerId, ApplicationUser user, Company company)
         {
-            [JsonPropertyName("start")]
-            public DateTime Start { get; set; }
-
-            [JsonPropertyName("end")]
-            public DateTime End { get; set; }
-
-            [JsonPropertyName("carBrand")]
-            public string CarBrand { get; set; }
-
-            [JsonPropertyName("carModel")]
-            public string CarModel { get; set; }
-
-            [JsonPropertyName("carYear")]
-            public int CarYear { get; set; }
-
-            [JsonPropertyName("price")]
-            public float Price { get; set; }
-        }
-
-        private async Task AddRentToDb(int rentId, string offerId, ApplicationUser user)
-        {
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Rent/getrent/{rentId}");
-            if (!rentCarResponse.IsSuccessStatusCode)
-            {
-                return;
-            }
-            var rentCarResponseContent = await rentCarResponse.Content.ReadAsStringAsync();
-            var rent = JsonSerializer.Deserialize<CompanyRent>(rentCarResponseContent);
-
             var newRent = new Rent
             {
-                RentId_in_company = rentId,
-                Rent_date = rent.Start,
-                Return_date = rent.End,
-                User_ID = user.Id,
-                Status = "Confirmed",
-                Company_ID = Guid.Parse("00000000-0000-0000-0000-000000000000"),
-                Offer_ID = Guid.Parse(offerId)
+                Rent_ID = company.Company_ID.ToString() + rentInfoFromApi.RentId,
+                RentId_in_company = rentInfoFromApi.RentId,
+                Rent_date = rentInfoFromApi.StartDate,
+                Return_date = rentInfoFromApi.EndDate,
+                User = user,
+                Status = RentStatus.Reserved,
+                Company = company,
+                Offer_ID = offerId
             };
 
             var newOffer = new Offer()
             {
-                Id = Guid.Parse(offerId),
-                Price = rent.Price,
-                Car = new Car(rent.CarBrand, rent.CarModel, rent.CarYear, string.Empty),
+                Id = offerId,
+                Price = rentInfoFromApi.Price,
+                Car = new Car(rentInfoFromApi.CarBrand, rentInfoFromApi.CarModel, rentInfoFromApi.CarYear, string.Empty),
                 Rent = newRent,
                 ClientId = user.Id.ToString(),
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(7)
+                StartDate = rentInfoFromApi.StartDate,
+                EndDate = rentInfoFromApi.EndDate
             };
 
             _context.Offers.Add(newOffer);

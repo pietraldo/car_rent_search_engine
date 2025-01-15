@@ -3,11 +3,12 @@ import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Style/Element.css';
-
+import Alert from './Alert';
 
 function Element({ car, apiUrl}) {
     const [buttonText, setButtonText] = useState("Rent me!");
     const navigate = useNavigate();
+
     const handleClick = () => {
 
         setButtonText((prevText) => (prevText !== "Reserved!" ? "Reserved!" : "Rent me!"));
@@ -17,7 +18,11 @@ function Element({ car, apiUrl}) {
             const response = await fetch(`Car/sendEmail/${car.offerId}`);
 
             if (response.ok)
-                alert("Email sent! Please confirm your rent");
+            {
+                console.log("Email sent! Please confirm your rent.");
+                Alert("green", "Email sent! Please confirm your rent on your email.");
+            }
+                
             const link = await response.text();
             console.log(link);
         }

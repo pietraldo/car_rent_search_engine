@@ -6,6 +6,9 @@ using car_rent.Server.Notifications;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
+using car_rent.Server.DataProvider;
+using Microsoft.Extensions.ObjectPool;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,11 +59,32 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<SearchEngineDbContext>()
     .AddDefaultTokenProviders().AddApiEndpoints();
 
+// Adding api
+builder.Services.AddTransient<CarRentalDataProvider1>();
+builder.Services.AddTransient<CarRentalDataProvider2>();
+
+builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider1>();
+builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider2>();
+
+
 builder.Services.AddHttpLogging(o => { });
 
-var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
-builder.Services.AddSingleton<string>(car_rent_company_api1);
+
+
+var apiUrl2 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API2")?? throw new InvalidOperationException("Missing car rent company API URL");
+var apiUrl1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1") ?? throw new InvalidOperationException("Missing car rent company API URL");
+
+string[] apiUrls = { apiUrl1, apiUrl2 };
+
+builder.Services.AddSingleton(apiUrls);
+
+
 builder.Services.AddSingleton<INotificationService, MailGunService>();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 

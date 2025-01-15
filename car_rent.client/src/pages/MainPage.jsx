@@ -57,12 +57,12 @@ function MainPage() {
                 model: item.car.model,
                 year: item.car.year,
                 brand: item.car.brand,
-                picture: item.car.picture,
+                picture: item.car.photo,
                 price: item.price,
                 endDate: item.endDate,
                 startDate: item.startDate,
                 offerId: item.id,
-                location: item.location.name
+                location: item.car.location.name
             }));
 
             setCars(carsData);

@@ -1,6 +1,7 @@
 ﻿using car_rent_api2.Server.Database;
 using car_rent.Server.Model;
 using RestSharp;
+using car_rent.Server.DTOs;
 
 namespace car_rent.Server.Notifications;
 
@@ -21,7 +22,7 @@ public class MailGunService : INotificationService, IEmailService
         return _client.SendEmail(email, subject, message);
     }
 
-    public void Notify(OfferToDisplay offer, string confirmationLink, ApplicationUser user)
+    public void Notify(OfferFromApi offer, string confirmationLink, ApplicationUser user)
     {
         var email = user.Email;
         var subject = "[Car Rent] Confirm Your Order";
