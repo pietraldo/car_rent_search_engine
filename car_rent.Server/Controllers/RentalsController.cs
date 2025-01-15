@@ -34,7 +34,7 @@ namespace car_rent.Server.Controllers
             }
 
             var rents = await _context.History
-                .Where(r => r.User_ID == user.Id)
+                .Where(r => r.User == user)
                 .Include(r => r.Offer)
                 .Include(r=>r.Offer.Car)
                 .ToListAsync();
@@ -63,7 +63,7 @@ namespace car_rent.Server.Controllers
                 .Include(r => r.Offer.Car)
                 .FirstOrDefaultAsync();
 
-            rent.Status = "returned";
+            rent.Status = RentStatus.Returned;
 
             await _context.SaveChangesAsync();
 

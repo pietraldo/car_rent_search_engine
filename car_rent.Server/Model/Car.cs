@@ -12,11 +12,11 @@ public class Car(string brand, string model, int year, string picture)
     public string Brand { get; set; } = brand;
     [JsonPropertyName("year")]
     public int Year { get; set; } = year;
+    [JsonPropertyName("picture")]
+    public string Picture { get; set; } = picture;
 
     public string GetCarInfo()
     {
         return $"Model: {Model}, Brand: {Brand}, Year: {Year}";
     }
-    [JsonPropertyName("picture")]
-    public string Picture { get; set; } = picture;
 }
