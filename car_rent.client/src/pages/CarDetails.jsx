@@ -93,7 +93,16 @@ const CarDetails = () => {
     return (
         <div className="car-details-container">
             <div className="car-photo">
-                <img src={carDetails.car.picture} alt="Car" className="car-photo-img" />
+                <img
+                    src={carDetails.car.picture || "..//..//dist//default.jpg"}
+                    alt="Car"
+                    className="car-photo-img"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "..//..//dist//default.jpg";
+
+                    }}
+                />
                 <Button className="rentButton2" onClick={handleClick}>
                     {buttonText}
                 </Button>
@@ -118,6 +127,27 @@ const CarDetails = () => {
                             <span className="textInfo"><strong>Price:</strong> {carDetails.price}$ </span>
                         </li>
                     </ul>
+                </div>
+
+                {/* Car details Section */}
+                <div className="section">
+                    <h2 className="subtitle">Car details</h2>
+                    {carDetails.carDetails && carDetails.carDetails.length > 0 ? (
+                        <ul className="list">
+                            {carDetails.carDetails.map((detail) => (
+                                <li className="list-item" key={detail.id}>
+                                    <span className="textInfo"><strong> {detail.description}</strong>
+                                        { detail.value ? (
+                                            `: ${detail.value}`
+                                        ) : null }
+                                        <br />
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No car details available.</p>
+                    )}
                 </div>
 
                 {/* Services Section */}
@@ -145,6 +175,7 @@ const CarDetails = () => {
                     )}
                 </div>
 
+                
                 {/* Location Section */}
                 <div className="section">
                     <h2 className="subtitle">Location</h2>

@@ -21,6 +21,7 @@ const BookingDatePicker = ({ startDate, endDate, setStartDate, setEndDate }) =>
                         minDate={new Date()}
                         placeholderText="Select start date"
                         className="custom-date-picker"
+                        dateFormat="dd/MM/yyyy"
                     />
                 </div>
 
