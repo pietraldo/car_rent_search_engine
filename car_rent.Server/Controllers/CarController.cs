@@ -14,6 +14,7 @@ using car_rent.Server.DTOs;
 using System.Text.Json.Nodes;
 using Microsoft.VisualBasic;
 using car_rent.Server.Notifications;
+using car_rent.Server.DataProvider;
 
 
 namespace car_rent.Server.Controllers
@@ -28,38 +29,31 @@ namespace car_rent.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly INotificationService _notificationService;
+        private readonly IEnumerable<ICarRentalDataProvider> _carRentalProviders;
 
-        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context, INotificationService notificationService)
+        public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager,
+            SearchEngineDbContext context, INotificationService notificationService, IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
             _apiUrl = car_rent_company_api1;
             _userManager = userManager;
             _context = context;
             _notificationService = notificationService;
+            _carRentalProviders = carRentalProviders;
         }
 
-        
+       
 
 
         [HttpGet(Name = "GetCars")]
-        public async Task<ActionResult<IEnumerable<OfferToDisplay>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
+        public async Task<ActionResult<IEnumerable<OfferFromApi>>> Get(DateTime startDate, DateTime endDate, string search_brand = "", string search_model = "")
         {
             var user = await _userManager.GetUserAsync(User);
             string clientId = (user == null ? "" : user.Id.ToString());
 
-            var requestUrl = $"{_apiUrl}/api/offer?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&brand={search_brand}&model={search_model}&clientId={clientId}";
+            List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId).Result).ToList();
 
-            try
-            {
-                var responseContent = await _httpClient.GetStringAsync(requestUrl);
-                var offersToDisplay = JsonSerializer.Deserialize<OfferFromApi[]>(responseContent);
-
-                return Ok(offersToDisplay);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return offers;
         }
 
         [HttpGet("getdetails/{offerId:guid}")]
@@ -79,7 +73,7 @@ namespace car_rent.Server.Controllers
                     carDetails.Car.Picture = $"{_apiUrl}/{carDetails.Car.Picture}";
                     return Ok(carDetails);
                 }
-                
+
                 return NotFound("Car details not found.");
             }
             catch (Exception ex)
@@ -111,7 +105,7 @@ namespace car_rent.Server.Controllers
             var json = await offerResponse.Content.ReadAsStreamAsync();
             var jsonString = await offerResponse.Content.ReadAsStringAsync();
             var offer = await JsonSerializer.DeserializeAsync<OfferToDisplay>(json);
-            
+
             _notificationService.Notify(offer, confirmationLink, user);
 
 
@@ -127,7 +121,7 @@ namespace car_rent.Server.Controllers
             string clientId = user.Id.ToString();
 
             ActionResult result = await CheckIfClientExistsInApi(clientId, user);
-            if(result != null)
+            if (result != null)
             {
                 return result;
             }
@@ -193,7 +187,7 @@ namespace car_rent.Server.Controllers
                 Return_date = rent.End,
                 User = user,
                 Status = RentStatus.Reserved,
-                Company=company,
+                Company = company,
                 Offer_ID = Guid.Parse(offerId)
             };
 

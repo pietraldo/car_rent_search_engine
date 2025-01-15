@@ -6,7 +6,7 @@ namespace car_rent.Server.DTOs;
 public class OfferFromApi
 {
     [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     [JsonPropertyName("car")]
     public CarFromAPi Car { get; set; }
 

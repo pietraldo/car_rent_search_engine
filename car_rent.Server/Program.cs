@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
+using car_rent.Server.DataProvider;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,14 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<SearchEngineDbContext>()
     .AddDefaultTokenProviders().AddApiEndpoints();
+
+// Adding api
+builder.Services.AddTransient<CarRentalDataProvider1>();
+builder.Services.AddTransient<CarRentalDataProvider2>();
+
+builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider1>();
+builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider2>();
+
 
 builder.Services.AddHttpLogging(o => { });
 
