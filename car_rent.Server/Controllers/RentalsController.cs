@@ -1,4 +1,5 @@
-﻿using car_rent.Server.Migrations;
+﻿using car_rent.Server.DataProvider;
+using car_rent.Server.Migrations;
 using car_rent.Server.Model;
 using car_rent_api2.Server.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -15,14 +16,16 @@ namespace car_rent.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl;
+        private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
-        public RentalsController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager, SearchEngineDbContext context)
+        public RentalsController(HttpClient httpClient, 
+            UserManager<ApplicationUser> userManager, SearchEngineDbContext context,
+            IEnumerable<ICarRentalDataProvider> carRentalProviders)
         {
             _httpClient = httpClient;
             _userManager = userManager;
-            _apiUrl = car_rent_company_api1;
             _context = context;
+            _carRentalProviders = carRentalProviders.ToList();
         }
         [HttpGet("rents")]
         public async Task<ActionResult<IEnumerable<Rent>>> Get()
@@ -34,7 +37,7 @@ namespace car_rent.Server.Controllers
             }
 
             var rents = await _context.History
-                .Where(r => r.User_ID == user.Id)
+                .Where(r => r.User == user)
                 .Include(r => r.Offer)
                 .Include(r=>r.Offer.Car)
                 .ToListAsync();
@@ -43,7 +46,7 @@ namespace car_rent.Server.Controllers
         }
 
         [HttpGet("return/{rentId}")]
-        public async Task<IActionResult> ReturnCar(int rentId)
+        public async Task<IActionResult> ReturnCar(string rentId)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -51,19 +54,30 @@ namespace car_rent.Server.Controllers
                 return NotFound("User not found.");
             }
 
-            var rentCarResponse = await _httpClient.GetAsync($"{_apiUrl}/api/Rent/readyToReturn/{rentId}");
-            if (!rentCarResponse.IsSuccessStatusCode)
-            {
-                return StatusCode((int)rentCarResponse.StatusCode, "Error renting car in external API");
-            }
+            
 
             var rent = await _context.History
                 .Where(r => r.RentId_in_company == rentId)
                 .Include(r => r.Offer)
                 .Include(r => r.Offer.Car)
+                .Include(r => r.Company)
                 .FirstOrDefaultAsync();
 
-            rent.Status = "returned";
+            bool success = false;
+            foreach(var provider in _carRentalProviders)
+            {
+                if(provider.GetProviderName()== rent.Company.Name)
+                {
+                    success=provider.ReturnCar(rentId).Result;
+                    break;
+                }
+            }
+            if(success == false)
+            {
+                return BadRequest("Error while returning the car.");
+            }
+
+            rent.Status = RentStatus.Returned;
 
             await _context.SaveChangesAsync();
 

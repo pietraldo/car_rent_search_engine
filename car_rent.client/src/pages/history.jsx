@@ -112,7 +112,7 @@ const History = () => {
                             <td>{rental.offer.car.model.toString() || "N/A"}</td>
                             <td>{rental.offer.car.year.toString() || "N/A"}</td>
                             <td>
-                                {rental.status !== 'returned' ? (
+                                {rental.status !== 'Returned' ? (
                                     <button className="btn btn-return" onClick={returnOffer(rental.rentId_in_company) }>Return</button>
                                 ) : (
                                     rental.status.toString()
