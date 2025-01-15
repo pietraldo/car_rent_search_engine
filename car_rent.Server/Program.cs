@@ -68,8 +68,12 @@ builder.Services.AddTransient<ICarRentalDataProvider, CarRentalDataProvider2>();
 
 builder.Services.AddHttpLogging(o => { });
 
-var car_rent_company_api1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
-builder.Services.AddSingleton<string>(car_rent_company_api1);
+var apiUrl1 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API1")?? throw new InvalidOperationException("Missing car rent company API URL");
+builder.Services.AddSingleton<string>(apiUrl1);
+
+var apiUrl2 = Environment.GetEnvironmentVariable("DOTNET_CARRENT_API2")?? throw new InvalidOperationException("Missing car rent company API URL");
+builder.Services.AddSingleton<string>(apiUrl2);
+
 builder.Services.AddSingleton<INotificationService, MailGunService>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>

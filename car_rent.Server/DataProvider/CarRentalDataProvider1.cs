@@ -14,61 +14,19 @@
     using System.Net.Http;
     using car_rent.Server.Migrations;
 
-    public class OfferForCarSearchDto
-    {
-        [JsonPropertyName("offerId")]
-        public string OfferId { get; set; }
-        [JsonPropertyName("brand")]
-        public string Brand { get; set; }
-        [JsonPropertyName("model")]
-        public string Model { get; set; }
-        [JsonPropertyName("price")]
-        public decimal Price { get; set; }
-        [JsonPropertyName("conditions")]
-        public string Conditions { get; set; }
-        [JsonPropertyName("companyName")]
-        public string CompanyName { get; set; }
-        [JsonPropertyName("location")]
-        public string Location { get; set; }
-        [JsonPropertyName("startDate")]
-        public DateTime StartDate { get; set; }
-        [JsonPropertyName("endDate")]
-        public DateTime EndDate { get; set; }
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
-    }
-
-    public class CachedOfferDto
-    {
-        [JsonPropertyName("carId")]
-        public int CarId { get; set; }
-        [JsonPropertyName("brand")]
-        public string Brand { get; set; }
-        [JsonPropertyName("model")]
-        public string Model { get; set; }
-        [JsonPropertyName("price")]
-        public decimal Price { get; set; }
-        public string Conditions { get; set; }
-        [JsonPropertyName("companyName")]
-        public string CompanyName { get; set; }
-        [JsonPropertyName("location")]
-        public string Location { get; set; }
-        [JsonPropertyName("startDate")]
-        public DateTime StartDate { get; set; }
-        [JsonPropertyName("endDate")]
-        public DateTime EndDate { get; set; }
-    }
+    
 
     public class CarRentalDataProvider1 : ICarRentalDataProvider
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _accessToken;
-        private readonly string _apiUrl = "https://localhost:7077";
+        private readonly string _apiUrl1;
 
-        public CarRentalDataProvider1(IHttpClientFactory httpClientFactory)
+        public CarRentalDataProvider1(IHttpClientFactory httpClientFactory, string apiUrl1)
         {
             _httpClientFactory = httpClientFactory;
             _accessToken = GenerateAccessToken();
+            _apiUrl1 = apiUrl1;
         }
 
         public string GetProviderName()
@@ -90,31 +48,12 @@
             return offerIdPlusProvider.Contains(GetProviderName());
         }
 
-        public class NewRentParametersDto
-        {
-            public string OfferId { get; set; }
-            public string Email { get; set; }
-        }
-
-        public class NewSearchRentDto
-        {
-            [JsonPropertyName("brand")]
-            public string Brand { get; set; }
-            [JsonPropertyName("model")]
-            public string Model { get; set; }
-            [JsonPropertyName("email")]
-            public string Email { get; set; }
-            [JsonPropertyName("startDate")]
-            public DateTime StartDate { get; set; }
-            [JsonPropertyName("endDate")]
-            public DateTime EndDate { get; set; }
-            [JsonPropertyName("rentalCompanyRentId")]
-            public int RentalCompanyRentId { get; set; }
-        }
+       
+       
 
         public async Task<bool> ReturnCar(string rentId)
         {
-            var url = $"{_apiUrl}/api/Rents/set-rent-status-ready-to-return";
+            var url = $"{_apiUrl1}/api/Rents/set-rent-status-ready-to-return";
             var client = GetClientWithBearerToken();
             var json = JsonSerializer.Serialize(int.Parse(rentId));
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -126,7 +65,7 @@
 
         public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
         {
-            var url = $"{_apiUrl}/api/rents/create-new-rent";
+            var url = $"{_apiUrl1}/api/rents/create-new-rent";
             var newRentParameters = new NewRentParametersDto() { OfferId = offerId, Email = user.Email };
             var json = JsonSerializer.Serialize(newRentParameters);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -143,7 +82,7 @@
 
         public async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
         {
-            var url = $"{_apiUrl}/api/offers/offer/{offerId}";
+            var url = $"{_apiUrl1}/api/offers/offer/{offerId}";
             var client = GetClientWithBearerToken();
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -159,7 +98,7 @@
             {
                 email = "emptyEmail";
             }
-            var url = $"{_apiUrl}/api/offers/offer-list?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&email={email}&brand={search_brand}&model={search_model}";
+            var url = $"{_apiUrl1}/api/offers/offer-list?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&email={email}&brand={search_brand}&model={search_model}";
             var client = GetClientWithBearerToken();
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
