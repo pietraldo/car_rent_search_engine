@@ -29,7 +29,7 @@ namespace car_rent.Server.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SearchEngineDbContext _context;
         private readonly INotificationService _notificationService;
-        private readonly IEnumerable<ICarRentalDataProvider> _carRentalProviders;
+        private readonly List<ICarRentalDataProvider> _carRentalProviders;
 
         public CarController(HttpClient httpClient, string car_rent_company_api1, UserManager<ApplicationUser> userManager,
             SearchEngineDbContext context, INotificationService notificationService, IEnumerable<ICarRentalDataProvider> carRentalProviders)
@@ -39,7 +39,7 @@ namespace car_rent.Server.Controllers
             _userManager = userManager;
             _context = context;
             _notificationService = notificationService;
-            _carRentalProviders = carRentalProviders;
+            _carRentalProviders = carRentalProviders.ToList();
         }
 
 
@@ -50,9 +50,9 @@ namespace car_rent.Server.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             string clientId = (user == null ? "" : user.Id.ToString());
-            string email =(user == null ? "" : user.Email);
+            string email = (user == null ? "" : user.Email);
 
-            List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId,email).Result).ToList();
+            List<OfferFromApi> offers = _carRentalProviders.SelectMany(provider => provider.GetOfferToDisplays(startDate, endDate, search_brand, search_model, clientId, email).Result).ToList();
 
             return offers;
         }
@@ -83,51 +83,69 @@ namespace car_rent.Server.Controllers
             }
         }
 
-        [HttpGet("sendEmail/{offerId}")]
-        public async Task<ActionResult<string>> SendEmail(string offerId)
+        [HttpGet("sendEmail/{offerIdPlusProvider}")]
+        public async Task<ActionResult<string>> SendEmail(string offerIdPlusProvider)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return Ok("");
+                return NotFound("Offer not found");
             }
 
             string url = $"{Request.Scheme}://{Request.Host}";
 
             // Build the confirmation link
-            string confirmationLink = $"{url}/Car/confirmationLink/{offerId}";
+            string confirmationLink = $"{url}/Car/confirmationLink/{offerIdPlusProvider}";
 
             await Console.Out.WriteLineAsync(confirmationLink);
 
-            var offers = _carRentalProviders.Select(provider => provider.GetOneOfferFromApi(offerId).Result).ToList();
-
-            var offer = offers.FirstOrDefault(o => o.Id == offerId);
-
-            //TODO: Uncomment this line to send the email
-            //_notificationService.Notify(offer, confirmationLink, user);
+            OfferFromApi? offer = null;
+            foreach (var provider in _carRentalProviders)
+            {
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
+                {
+                    string offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    offer = provider.GetOneOfferFromApi(offerId).Result;
+                    break;
+                }
+            }
+            if (offer == null)
+            {
+                return NotFound("Offer not found");
+            }
+            _notificationService.Notify(offer, confirmationLink, user);
 
 
             return Ok("Confirmation email sent");
         }
 
         [Authorize]
-        [HttpGet("confirmationLink/{offerId}")]
-        public async Task<ActionResult> ConfirmationLink(string offerId)
+        [HttpGet("confirmationLink/{offerIdPlusProvider}")]
+        public async Task<ActionResult> ConfirmationLink(string offerIdPlusProvider)
         {
             // Get the authenticated user
             var user = await _userManager.GetUserAsync(User);
             string clientId = user.Id.ToString();
 
-            var rents = _carRentalProviders.Select(provider => provider.RentCar(offerId, user, clientId).Result).ToList();
-
-            var rent = rents[0];
-
+            RentInfoFromApi? rent = null;
+            string offerId = string.Empty;
+            string companyName = string.Empty;
+            foreach (var provider in _carRentalProviders)
+            {
+                if (provider.CheckIfMyOffer(offerIdPlusProvider))
+                {
+                    offerId = provider.RemoveProviderName(offerIdPlusProvider);
+                    companyName = provider.GetProviderName();
+                    rent = provider.RentCar(offerId, user, clientId).Result;
+                    break;
+                }
+            }
             if (rent == null)
             {
                 return NotFound("Rent not found");
             }
-            //TODO: make this find real company
-            Company company = _context.Companies.FirstOrDefault();
+
+            Company company = _context.Companies.FirstOrDefault(c=> c.Name==companyName);
             await AddRentToDb(rent, offerId, user, company);
 
             return Redirect("/successfulRent");

@@ -12,6 +12,7 @@
     using System.Text.Json.Serialization;
     using car_rent_api2.Server.Database;
     using System.Net.Http;
+    using car_rent.Server.Migrations;
 
     public class OfferForCarSearchDto
     {
@@ -75,6 +76,20 @@
             return "CarRental";
         }
 
+        public string AddProviderName(string offerId)
+        {
+            return offerId + "*" + GetProviderName();
+        }
+        public string RemoveProviderName(string offerIdPlusProvider)
+        {
+            return offerIdPlusProvider.Split("*")[0];
+        }
+
+        public bool CheckIfMyOffer(string offerIdPlusProvider)
+        {
+            return offerIdPlusProvider.Contains(GetProviderName());
+        }
+
         public class NewRentParametersDto
         {
             public string OfferId { get; set; }
@@ -134,7 +149,7 @@
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var offer = JsonSerializer.Deserialize<CachedOfferDto>(responseString);
-            return new OfferFromApi() { Id=offerId, Price= (double)offer.Price, Car = new CarFromAPi() {Brand= offer.Brand, Model = offer.Model } };
+            return new OfferFromApi() { IdPlusProvider = offerId, Price= (double)offer.Price, Car = new CarFromAPi() {Brand= offer.Brand, Model = offer.Model } };
         }
 
         public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
@@ -155,9 +170,8 @@
             List<OfferFromApi> result = new List<OfferFromApi>();
             foreach(var offer in offers)
             {
-                Console.WriteLine(offer.OfferId);
                 OfferFromApi offerFromApi = new OfferFromApi();
-                offerFromApi.Id = offer.OfferId;
+                offerFromApi.IdPlusProvider = AddProviderName(offer.OfferId);
                 offerFromApi.Car = new CarFromAPi();
                 offerFromApi.Car.Brand = offer.Brand;
                 offerFromApi.Car.Model = offer.Model;

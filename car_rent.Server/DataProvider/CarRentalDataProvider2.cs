@@ -48,7 +48,21 @@
 
         public string GetProviderName()
         {
-            return "CarRental";
+            return "DriveEasy";
+        }
+
+        public string AddProviderName(string offerId)
+        {
+            return offerId+ "*" + GetProviderName();
+        }
+        public string RemoveProviderName(string offerIdPlusProvider)
+        {
+            return offerIdPlusProvider.Split("*")[0];
+        }
+
+        public bool CheckIfMyOffer(string offerIdPlusProvider)
+        {
+            return offerIdPlusProvider.Contains(GetProviderName());
         }
 
         public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
@@ -95,6 +109,11 @@
             {
                 var responseContent = await _httpClient.GetStringAsync(requestUrl);
                 var offerFromApi = JsonSerializer.Deserialize<OfferFromApi[]>(responseContent);
+
+                foreach (var offer in offerFromApi)
+                {
+                    offer.IdPlusProvider = AddProviderName(offer.IdPlusProvider);
+                }
 
                 return offerFromApi != null ? offerFromApi.ToList() : new List<OfferFromApi>();
             }

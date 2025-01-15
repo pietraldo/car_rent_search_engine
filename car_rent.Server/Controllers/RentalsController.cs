@@ -56,13 +56,28 @@ namespace car_rent.Server.Controllers
                 return NotFound("User not found.");
             }
 
-            _carRentalProviders[0].ReturnCar(rentId);
+            
 
             var rent = await _context.History
                 .Where(r => r.RentId_in_company == rentId)
                 .Include(r => r.Offer)
                 .Include(r => r.Offer.Car)
+                .Include(r => r.Company)
                 .FirstOrDefaultAsync();
+
+            bool success = false;
+            foreach(var provider in _carRentalProviders)
+            {
+                if(provider.GetProviderName()== rent.Company.Name)
+                {
+                    success=provider.ReturnCar(rentId).Result;
+                    break;
+                }
+            }
+            if(success == false)
+            {
+                return BadRequest("Error while returning the car.");
+            }
 
             rent.Status = RentStatus.Returned;
 

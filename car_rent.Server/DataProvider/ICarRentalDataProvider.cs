@@ -10,5 +10,10 @@ namespace car_rent.Server.DataProvider
         Task<OfferFromApi> GetOneOfferFromApi(string offerId);
         Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId);
         Task<bool> ReturnCar(string rentId);
+
+        string GetProviderName();
+        string AddProviderName(string offerId);
+        string RemoveProviderName(string offerIdPlusProvider);
+        bool CheckIfMyOffer(string offerIdPlusProvider);
     }
 }
