@@ -96,8 +96,10 @@ const History = () => {
                         <th>Return Date</th>
                         <th>Price</th>
                         <th>Brand</th>
+                        <th>Model</th>
+                        <th>Car year</th>
                         <th>Status</th>
-                        <th>Details</th>
+                        <th>Company</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,17 +108,17 @@ const History = () => {
                             <td>{new Date(rental.rent_date).toLocaleDateString()}</td>
                             <td>{new Date(rental.return_date).toLocaleDateString()}</td>
                             <td>{rental.offer.price.toString() || "N/A"}</td>
-                            <td>{rental.offer.car.brand || "N/A"}</td>
+                            <td>{rental.offer.car.brand.toString() || "N/A"}</td>
+                            <td>{rental.offer.car.model.toString() || "N/A"}</td>
+                            <td>{rental.offer.car.year.toString() || "N/A"}</td>
                             <td>
                                 {rental.status !== 'returned' ? (
                                     <button className="btn btn-return" onClick={returnOffer(rental.rentId_in_company) }>Return</button>
                                 ) : (
-                                    rental.status
+                                    rental.status.toString()
                                 )}
                             </td>
-                            <td>
-                                <button className="btn btn-details" onClick={() => navigate(`/rent_details`)}>Show details</button>
-                            </td>
+                            <td>{rental.company.name.toString() || "N/A"}</td>
                         </tr>
                     ))}
                 </tbody>
