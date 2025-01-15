@@ -163,19 +163,14 @@ function MainPage() {
     return (
         <div>
             {location.pathname === '/' && (
-                isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
-                        <CircularProgress size={60} />
-                    </Box>
-                ) : (
-                    <div className="filter-wrapper">
-                        <div className="filters">
-                            
-                            <CollapsibleSectionGeneric
-                                title="Brands"
-                                isOpen={openSection === 'Brands'}
-                                toggle={() => toggleSection('Brands')}
-                            >
+                <div className="filter-wrapper">
+                    <div className="filters">
+                        <CollapsibleSectionGeneric
+                            title="Brands"
+                            isOpen={openSection === 'Brands'}
+                            toggle={() => toggleSection('Brands')}
+                        >
+                            {isLoading ? <p>Loading brands...</p> : (
                                 <Filter
                                     options={uniqueBrands}
                                     selectedValues={selectedBrands}
@@ -187,12 +182,14 @@ function MainPage() {
                                         )
                                     }
                                 />
-                            </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric
-                                title="Models"
-                                isOpen={openSection === 'Models'}
-                                toggle={() => toggleSection('Models')}
-                            >
+                            )}
+                        </CollapsibleSectionGeneric>
+                        <CollapsibleSectionGeneric
+                            title="Models"
+                            isOpen={openSection === 'Models'}
+                            toggle={() => toggleSection('Models')}
+                        >
+                            {isLoading ? <p>Loading models...</p> : (
                                 <Filter
                                     options={uniqueModels}
                                     selectedValues={selectedModels}
@@ -204,12 +201,14 @@ function MainPage() {
                                         )
                                     }
                                 />
-                            </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric
-                                title="Years"
-                                isOpen={openSection === 'Years'}
-                                toggle={() => toggleSection('Years')}
-                            >
+                            )}
+                        </CollapsibleSectionGeneric>
+                        <CollapsibleSectionGeneric
+                            title="Years"
+                            isOpen={openSection === 'Years'}
+                            toggle={() => toggleSection('Years')}
+                        >
+                            {isLoading ? <p>Loading years...</p> : (
                                 <Filter
                                     options={uniqueYears}
                                     selectedValues={selectedYears}
@@ -221,12 +220,14 @@ function MainPage() {
                                         )
                                     }
                                 />
-                            </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric
-                                title="Locations"
-                                isOpen={openSection === 'Locations'}
-                                toggle={() => toggleSection('Locations')}
-                            >
+                            )}
+                        </CollapsibleSectionGeneric>
+                        <CollapsibleSectionGeneric
+                            title="Locations"
+                            isOpen={openSection === 'Locations'}
+                            toggle={() => toggleSection('Locations')}
+                        >
+                            {isLoading ? <p>Loading locations...</p> : (
                                 <Filter
                                     options={uniqueLocations}
                                     selectedValues={selectedLocations}
@@ -238,45 +239,48 @@ function MainPage() {
                                         )
                                     }
                                 />
-                            </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric
-                                title="Booking Dates"
-                                isOpen={openSection === 'Booking Dates'}
-                                toggle={() => toggleSection('Booking Dates')}
-                            >
-                                <BookingDatePicker
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    setStartDate={setStartDate}
-                                    setEndDate={setEndDate}
-                                />
-                            </CollapsibleSectionGeneric>
-                            <CollapsibleSectionGeneric
-                                title="Price Range"
-                                isOpen={openSection === 'Price Range'}
-                                toggle={() => toggleSection('Price Range')}
-                            >
-                                    <div className="price-range">
-                                        <Box sx={{ width: 200 }} >
-                                        <Slider
-                                            getAriaLabel={() => 'Price range'}
-                                            value={priceRange}
-                                            onChange={handleSliderChange}
-                                            valueLabelDisplay="auto"
-                                            valueLabelFormat={(value) => `$${value}`} // Add "$" to the value
-                                            min={0}
-                                            max={maxPrice}
-                                            step={1}
-                                        />
-                                    </Box>
-                                   
-                                </div>
-                            </CollapsibleSectionGeneric>
-                            <Button onClick={fetchCars} className="searchButton">Search</Button>
-                        </div>
-                        <div className="contents">{contents}</div>
+                            )}
+                        </CollapsibleSectionGeneric>
+                        <CollapsibleSectionGeneric
+                            title="Booking Dates"
+                            isOpen={openSection === 'Booking Dates'}
+                            toggle={() => toggleSection('Booking Dates')}
+                        >
+                            <BookingDatePicker
+                                startDate={startDate}
+                                endDate={endDate}
+                                setStartDate={setStartDate}
+                                setEndDate={setEndDate}
+                            />
+                        </CollapsibleSectionGeneric>
+                        <CollapsibleSectionGeneric
+                            title="Price Range"
+                            isOpen={openSection === 'Price Range'}
+                            toggle={() => toggleSection('Price Range')}
+                        >
+                            <div className="price-range">
+                                <Box sx={{ width: 200 }}>
+                                    <Slider
+                                        getAriaLabel={() => 'Price range'}
+                                        value={priceRange}
+                                        onChange={handleSliderChange}
+                                        valueLabelDisplay="auto"
+                                        valueLabelFormat={(value) => `$${value}`}
+                                        min={0}
+                                        max={maxPrice}
+                                        step={1}
+                                    />
+                                </Box>
+                            </div>
+                        </CollapsibleSectionGeneric>
+                        <Button onClick={fetchCars} className="searchButton">Search</Button>
                     </div>
-                )
+                    <div className="contents">{isLoading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}>
+                            <CircularProgress size={60} />
+                        </Box>
+                    ) : contents}</div>
+                </div>
             )}
             <TransitionGroup>
                 <CSSTransition key={location.key} classNames="fade" timeout={300}>
