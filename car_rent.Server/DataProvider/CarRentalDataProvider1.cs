@@ -10,6 +10,7 @@
     using car_rent.Server.Model;
     using car_rent.Server.DTOs;
     using System.Text.Json.Serialization;
+    using car_rent_api2.Server.Database;
 
     public class OfferForCarSearchDto
     {
@@ -52,22 +53,69 @@
             return "CarRental";
         }
 
-        public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId)
+        public class NewRentParametersDto
         {
-            if(clientId.IsNullOrEmpty())
+            public string OfferId { get; set; }
+            public string Email { get; set; }
+        }
+
+        public class NewSearchRentDto
+        {
+            [JsonPropertyName("brand")]
+            public string Brand { get; set; }
+            [JsonPropertyName("model")]
+            public string Model { get; set; }
+            [JsonPropertyName("email")]
+            public string Email { get; set; }
+            [JsonPropertyName("startDate")]
+            public DateTime StartDate { get; set; }
+            [JsonPropertyName("endDate")]
+            public DateTime EndDate { get; set; }
+            [JsonPropertyName("rentalCompanyRentId")]
+            public int RentalCompanyRentId { get; set; }
+        }
+
+        public async Task<RentInfoFromApi?> RentCar(string offerId, ApplicationUser user, string clientId)
+        {
+            var url = $"{_apiUrl}/api/rents/create-new-rent";
+            var newRentParameters = new NewRentParametersDto() { OfferId = offerId, Email = user.Email };
+            var json = JsonSerializer.Serialize(newRentParameters);
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
+            var client = GetClientWithBearerToken();
+            var response = await client.PostAsync(url, data);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var new_search_rent = JsonSerializer.Deserialize<NewSearchRentDto>(responseString);
+
+            var rent =new RentInfoFromApi() { RentId = new_search_rent.RentalCompanyRentId.ToString(), StartDate = new_search_rent.StartDate, EndDate = new_search_rent.EndDate, CarBrand = new_search_rent.Brand, CarModel = new_search_rent.Model, CarYear = -1, Price = 33542};
+
+            return rent;
+        }
+
+        public async Task<OfferFromApi> GetOneOfferFromApi(string offerId)
+        {
+            return new OfferFromApi() { Id=offerId, Price=33, Car = new CarFromAPi() {Brand="test brand", Model = "test model" } };
+        }
+
+        public async Task<List<OfferFromApi>> GetOfferToDisplays(DateTime startDate, DateTime endDate, string search_brand, string search_model, string clientId, string email)
+        {
+            
+            if(email.IsNullOrEmpty())
             {
-                clientId = "ad123";
+                email = "emptyEmail";
             }
-            var url = $"{_apiUrl}/api/offers/offer-list?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&email={clientId}&brand={search_brand}&model={search_model}";
+            var url = $"{_apiUrl}/api/offers/offer-list?startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}&email={email}&brand={search_brand}&model={search_model}";
             var client = GetClientWithBearerToken();
             var response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             var offers = JsonSerializer.Deserialize<List<OfferForCarSearchDto>>(responseString);
 
+
             List<OfferFromApi> result = new List<OfferFromApi>();
             foreach(var offer in offers)
             {
+                Console.WriteLine(offer.OfferId);
                 OfferFromApi offerFromApi = new OfferFromApi();
                 offerFromApi.Id = offer.OfferId;
                 offerFromApi.Car = new CarFromAPi();
@@ -88,19 +136,7 @@
         }
 
 
-        public async Task<List<Car>> GetCars()
-        {
-            //var url = "https://localhost:7077/api/Cars/car-list";
-            //var client = GetClientWithBearerToken();
-            //var response = await client.GetAsync(url);
-            //response.EnsureSuccessStatusCode();
-            //var responseString = await response.Content.ReadAsStringAsync();
-            //var cars = JsonSerializer.Deserialize<List<Car>>(responseString);
-            //return cars;
-            Car car2 = new Car("BMW", "X5", 2019, "bmw.jpg");
-            return new List<Car> { car2 };
-        }
-
+       
         private HttpClient GetClientWithBearerToken()
         {
             var client = _httpClientFactory.CreateClient();

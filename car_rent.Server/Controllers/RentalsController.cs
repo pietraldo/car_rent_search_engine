@@ -43,7 +43,7 @@ namespace car_rent.Server.Controllers
         }
 
         [HttpGet("return/{rentId}")]
-        public async Task<IActionResult> ReturnCar(int rentId)
+        public async Task<IActionResult> ReturnCar(string rentId)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)

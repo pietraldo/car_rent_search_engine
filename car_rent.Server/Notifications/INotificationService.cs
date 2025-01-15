@@ -6,5 +6,5 @@ namespace car_rent.Server.Notifications;
 
 public interface INotificationService
 {
-    public void Notify(OfferToDisplay offer, string confirmationLink, ApplicationUser user);
+    public void Notify(OfferFromApi offer, string confirmationLink, ApplicationUser user);
 }
