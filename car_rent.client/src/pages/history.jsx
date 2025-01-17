@@ -111,7 +111,7 @@ const History = () => {
                             <td>{rental.offer.price.toString() || "N/A"}</td>
                             <td>{rental.offer.car.brand.toString() || "N/A"}</td>
                             <td>{rental.offer.car.model.toString() || "N/A"}</td>
-                            <td>{rental.offer.car.year.toString() || "N/A"}</td>
+                            <td>{(rental.offer.car.year !== -1 ? rental.offer.car.year : "No data").toString() || "N/A"}</td>
                             <td>
                                 {rental.status !== 'Returned' ? (
                                     <button className="btn btn-return" onClick={returnOffer(rental.rentId_in_company) }>Return</button>

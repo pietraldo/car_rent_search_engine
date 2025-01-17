@@ -92,7 +92,7 @@ function MainPage() {
 
     const uniqueBrands = cars.length > 0 ? [...new Set(cars.map((car) => car.brand))] : [];
     const uniqueModels = cars.length > 0 ? [...new Set(cars.map((car) => car.model))] : [];
-    const uniqueYears = cars.length > 0 ? [...new Set(cars.map((car) => car.year))] : [];
+    const uniqueYears = cars.length > 0 ? [...new Set(cars.map((car) => car.year).filter((x) => {return x !== -1;}))] : [];
     const uniqueLocations = cars.length > 0 ? [...new Set(cars.map((car) => car.location))] : [];
 
     useEffect(() => {
