@@ -46,4 +46,28 @@ public class UserController : ControllerBase
 
         return Ok();
     }
+    
+    [Authorize]
+    [HttpGet("getUserData")]
+    public async Task<ActionResult<object>> GetUserData()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return Unauthorized("User not found.");
+        }
+
+        return new
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            City = user.City,
+            Country = user.Country,
+            HouseNumber = user.HouseNumber,
+            DrivingLicenseIssueDate = user.DrivingLicenseIssueDate?.ToString("yyyy-MM-dd"),
+            DateOfBirth = user.DateOfBirth?.ToString("yyyy-MM-dd")
+        };
+    }
+    
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Style/filldata.css";
 
@@ -12,7 +12,14 @@ function UpdateUserData() {
     const [dateOfBirth, setDateOfBirth] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-
+    
+    useEffect(() => {
+        getUserData().catch((error) => {
+            console.error(error);
+            setError("Failed to fetch user data.");
+        });
+    }, []);
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         switch (name) {
@@ -77,7 +84,31 @@ function UpdateUserData() {
                 });
         }
     };
-
+    
+    const getUserData = async () => {
+        fetch("/api/User/getUserData")
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to fetch user data.");
+                }
+            })
+            .then((data) => {
+                setFirstName(data.firstName);
+                setLastName(data.lastName);
+                setCity(data.city);
+                setCountry(data.country);
+                setHouseNumber(data.houseNumber);
+                setDrivingLicenseIssueDate(data.drivingLicenseIssueDate);
+                setDateOfBirth(data.dateOfBirth);
+            })
+            .catch((error) => {
+                console.error(error);
+                setError("Failed to fetch user data.");
+            });
+    }
+    
     return (
         <div className="containerbox">
             <h3>Fill Data</h3>
