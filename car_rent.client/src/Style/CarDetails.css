@@ -1,3 +1,5 @@
+@import url('https://rsms.me/inter/inter.css');
+
 /* General styling for the page */
 .car-details-container {
     display: flex;
@@ -7,7 +9,7 @@
     left: 5%;
     width: 80%;
     padding: 20px;
-    font-family: Arial, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, Roboto, Segoe UI, Arial, sans-serif;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -44,7 +46,7 @@
     flex-direction: column; /* Stack sections vertically */
     gap: 20px; /* Space between each section */
     max-width: 900px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, Roboto, Segoe UI, Arial, sans-serif;
 }
 
 /* Section styles for individual sections like Specifications, Services */
@@ -129,7 +131,7 @@
     width: 80%;
     background-color: #4a90e2; /* Subtle blue background */
     border-radius: 15px; /* Rounded corners for a modern look */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, Roboto, Segoe UI, Arial, sans-serif;
     font-size: 16px;
     font-weight: bold;
     color: white;

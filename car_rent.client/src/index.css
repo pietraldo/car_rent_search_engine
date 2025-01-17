@@ -1,4 +1,4 @@
-
+@import url('https://rsms.me/inter/inter.css');
 
 a {
   font-weight: 500;
@@ -28,7 +28,7 @@ button {
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, Roboto, Segoe UI, Arial, sans-serif;
   cursor: pointer;
   transition: border-color 0.25s;
 }
