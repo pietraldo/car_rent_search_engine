@@ -50,7 +50,7 @@
 }
 
 .rentButton {
-    background-color: rgb(255, 0, 0) !important; /* Ensure Bootstrap styles don't override */
+    background-color: rgb(177, 60, 205) !important; /* Ensure Bootstrap styles don't override */
     color: white !important;
     padding: 10px 20px;
     border: none;
