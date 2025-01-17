@@ -5,11 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import '../Style/Element.css';
 import Alert from './Alert';
 
-function Element({ car, apiUrl}) {
-    const [buttonText, setButtonText] = useState("Rent me!");
+function Element({ car, apiUrl, loggedIn}) {
+    const [buttonText, setButtonText] = useState(loggedIn ? "Rent me!" : "Login to rent");
     const navigate = useNavigate();
 
     const handleClick = () => {
+        
+        if (!loggedIn) return;
 
         setButtonText((prevText) => (prevText !== "Reserved!" ? "Reserved!" : "Rent me!"));
 

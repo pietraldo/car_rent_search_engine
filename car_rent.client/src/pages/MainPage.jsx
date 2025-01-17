@@ -30,6 +30,7 @@ function MainPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [maxPrice, setMaxPrice] = useState(10000);
+    const [loggedIn, setLoggedIn] = useState(false);
     const carsPerPage = 5;
 
     const [startDate, setStartDate] = useState(new Date());
@@ -86,7 +87,21 @@ function MainPage() {
         setIsLoading(false);
     };
 
+    // Helper function to get the value of a cookie
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return decodeURIComponent(parts.pop().split(";").shift());
+        }
+        return null;
+    }
+    
     useEffect(() => {
+        let email = getCookie("UserEmail");
+        if (email) {
+            setLoggedIn(true);
+        }
         fetchCars();
     }, []);
 
@@ -144,7 +159,7 @@ function MainPage() {
         ) : (
             <div>
                 {currentCars.map((car) => (
-                    <Element key={car.offerId} car={car} apiUrl={apiUrl} />
+                    <Element key={car.offerId} car={car} apiUrl={apiUrl} loggedIn={loggedIn}/>
                 ))}
                 <div className="pagination">
                     {Array.from({ length: totalPages }, (_, i) => (
