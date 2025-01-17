@@ -44,7 +44,7 @@ function Element({ car, apiUrl}) {
                 <h2 className="carTitle">{car.model}</h2>
                 <p className="carDescription">
                     Brand: {car.brand} <br />
-                    Year: {car.year} <br />
+                    Year: {car.year !== -1 ? car.year : "No data"} <br />
                 </p>
             </div>
             <div className="rentInfo">

@@ -123,7 +123,7 @@ const CarDetails = () => {
                         <li className="list-item">
                             <span className="textInfo"><strong>Brand:</strong> {carDetails.car.brand} <br /> </span>
                             <span className="textInfo"><strong>Model:</strong> {carDetails.car.model} <br /> </span>
-                            <span className="textInfo"><strong>Year:</strong> {carDetails.car.year} <br /> </span>
+                            <span className="textInfo"><strong>Year:</strong> {carDetails.car.year !== -1 ? carDetails.car.year : "No data"} <br /> </span>
                             <span className="textInfo"><strong>Price:</strong> {carDetails.price}$ </span>
                         </li>
                     </ul>

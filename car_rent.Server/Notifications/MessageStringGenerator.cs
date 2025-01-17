@@ -18,7 +18,7 @@ Confirm Order
 <p>Order details:</p>
 <ul>
 <li>Car: {offer.Car.Brand} {offer.Car.Model}</li>
-<li>Year: {offer.Car.Year}</li>
+<li>Year: {(offer.Car.Year != -1 ? offer.Car.Year : "No data")}</li>
 <li>Price: {offer.Price}</li> 
 </ul>
 </body>
