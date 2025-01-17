@@ -11,4 +11,7 @@
   <ItemGroup>
     <None Remove="src\components\api.jsx" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public\Nowy folder\" />
+  </ItemGroup>
 </Project>

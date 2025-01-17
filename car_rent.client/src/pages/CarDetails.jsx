@@ -94,12 +94,12 @@ const CarDetails = () => {
         <div className="car-details-container">
             <div className="car-photo">
                 <img
-                    src={carDetails.car.picture || "../../dist//default.jpg"}
+                    src={carDetails.car.picture || "/images/default.jpg"}
                     alt="Car"
                     className="car-photo-img"
                     onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "../../dist/default.jpg";
+                        e.target.src = "/images/default.jpg";
 
                     }}
                 />
