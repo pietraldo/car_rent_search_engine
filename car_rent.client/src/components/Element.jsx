@@ -11,7 +11,11 @@ function Element({ car, apiUrl, loggedIn}) {
 
     const handleClick = () => {
         
-        if (!loggedIn) return;
+        if (!loggedIn) {
+            console.log("You need to be logged in to rent a car.");
+            Alert("red", "You need to be logged in to rent a car.");
+            return;   
+        }
 
         setButtonText((prevText) => (prevText !== "Reserved!" ? "Reserved!" : "Rent me!"));
 
