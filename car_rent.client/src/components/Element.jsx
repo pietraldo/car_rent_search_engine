@@ -32,12 +32,12 @@ function Element({ car, apiUrl}) {
     return (
         <div className="carContainer">
             <img
-                src={car.picture || "..//..//dist//default.jpg"}
+                src={car.picture || "../../dist/default.jpg"}
                 alt={car.model}
                 className="carImage"
                 onError={(e) => {
                     e.target.onerror = null; // Prevent infinite loop in case the default image also fails
-                    e.target.src = "..//..//dist//default.jpg"; // Set a fallback image
+                    e.target.src = "../../dist/default.jpg"; // Set a fallback image
                 }}
             />
             <div style={{ flex: 1 }}>

@@ -1,7 +1,21 @@
 /* eslint-disable react/prop-types */
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
+import 'leaflet/dist/leaflet.css';
+
+// Import marker assets
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Fix for missing marker icons after deployment
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
+});
 
 const LocationMap = ({ lat, lon, name }) => {
     const position = [lat, lon]; // Coordinates for the marker

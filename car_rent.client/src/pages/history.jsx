@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../Style/history.css";
+import Alert from "../components/Alert";
 
 const History = () => {
     const navigate = useNavigate();
@@ -59,7 +60,7 @@ const History = () => {
         console.log("returning...");
         console.log(`/api2/Rentals/return/${rentId}`)
         const response = await fetch(`/api2/Rentals/return/${rentId}`);
-
+        Alert("green", "Car returned succesfully!");
         fetchHistory();
     }
 
